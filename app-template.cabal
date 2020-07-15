@@ -1,0 +1,126 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.33.0.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: 538fb662404b4e0e4f354dc222cd5a697868a1d3d982f45b730cd4408845c11e
+
+name:           app-template
+version:        0.1.0.0
+description:    Please see the README on GitHub at <https://github.com/Github username here/app-template#readme>
+homepage:       https://github.com/Github username here/app-template#readme
+bug-reports:    https://github.com/Github username here/app-template/issues
+author:         Author name here
+maintainer:     Author email here
+copyright:      2019 Author name here
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+    ChangeLog.md
+
+source-repository head
+  type: git
+  location: https://github.com/Github username here/app-template
+
+library
+  exposed-modules:
+      Design.ChurchFreeMonad
+      Design.FM
+      Design.TF.Extensibility
+      Design.TF.FirstOrderLang
+      Design.TF.HigherOrderLang
+      Design.TF.HigherOrderLang2
+      Design.TF.PatternMatching
+      Design.TF.Serialization
+      Design.TF.TF
+      Extensions.Arrows
+      Extensions.BangPatterns
+      Extensions.ConstrainedClassMethods
+      Extensions.ConstraintKinds
+      Extensions.DataKinds
+      Extensions.DefaultSignatures
+      Extensions.DeriveAnyClass
+      Extensions.DeriveLift
+      Extensions.DeriveLiftConsumer
+      Extensions.DerivingVia
+      Extensions.EmptyCase
+      Extensions.ExistentialQuantification
+      Extensions.FlexibleContexts
+      Extensions.FunctionalDependencies
+      Extensions.Gadts
+      Extensions.GeneralisedNewtypeDeriving
+      Extensions.ImplicitParams
+      Extensions.LiberalTypeSynonyms
+      Extensions.MultiParamTypeClasses
+      Extensions.PatternSynonyms
+      Extensions.PolyKinds
+      Extensions.QuantifiedConstraints
+      Extensions.RankNTypes
+      Extensions.Records
+      Extensions.ScopedTypeVariables
+      Extensions.StandaloneDeriving
+      Extensions.StandaloneKindSignatures
+      Extensions.TH.LensExample
+      Extensions.TH.TemplateHaskell
+      Extensions.TH.TemplateHaskellConsumerModule
+      Extensions.TH.THLenses
+      Extensions.TypeFamilies
+      Extensions.TypeFamilyDependencies
+      Extensions.Unboxed
+      Extensions.UndecidableInstances
+      Extensions.ViewPatterns
+      HsSyntax.AssociatedData
+      HsSyntax.AssociatedTypes
+      HsSyntax.Compose
+      HsSyntax.EqualityConstraints
+      HsSyntax.FixAndRec
+      Lenses.AppLens
+      Lenses.Composability
+      Lenses.Lens
+      Lenses.Lenses
+      Lib
+  other-modules:
+      Paths_app_template
+  hs-source-dirs:
+      src
+  ghc-options: -Weverything -Wcompat -Wno-safe -Wno-unused-top-binds -Wno-missing-import-lists -Wno-missing-safe-haskell-mode -Wno-implicit-prelude -Wno-unsafe -Wno-unused-packages
+  build-depends:
+      base >=4.7 && <5
+    , ghc-prim
+    , mtl
+    , template-haskell
+  default-language: Haskell2010
+
+executable app-template-exe
+  main-is: Main.hs
+  other-modules:
+      Paths_app_template
+  hs-source-dirs:
+      app
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N -Wall
+  build-depends:
+      app-template
+    , base >=4.7 && <5
+    , ghc-prim
+    , mtl
+    , template-haskell
+  default-language: Haskell2010
+
+test-suite app-template-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Paths_app_template
+  hs-source-dirs:
+      test
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      app-template
+    , base >=4.7 && <5
+    , ghc-prim
+    , mtl
+    , template-haskell
+  default-language: Haskell2010
