@@ -59,7 +59,7 @@ map2TH = [
     wildCardPat = WildP
     body2 = NormalB (ConE '[])
 
--- | Se usage in TemplateHaskell2
+-- | Look at usages in TemplateHaskellConsumerModule
 
 createMap2Func :: DecsQ
 createMap2Func = pure map2TH
