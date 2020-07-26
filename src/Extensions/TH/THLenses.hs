@@ -84,6 +84,18 @@ exprBrackets = [e| (a + 3) * 4 |]
 typeBrackets :: Q Type -- Type sig
 typeBrackets = [t| forall a . Int -> a -> [a] |]
 
+
+newtype MyType = MyType String
+
+typeViaTypename :: Q Type -- Type sig
+typeViaTypename = pure $ VarT ''MyType
+
+exprViaCtorName :: Q Exp
+exprViaCtorName = pure $ AppE (ConE 'MyType) (LitE (StringL "qwe"))
+
+-- ''Type - typename
+-- 'MkType - ctor name
+
 patternBrackets :: Q Pat -- PAttern matching
 patternBrackets = [p| (a, x:xs, _) |]
 

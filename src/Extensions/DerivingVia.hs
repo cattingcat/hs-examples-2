@@ -16,7 +16,6 @@ newtype Dollars = Dollars Int
 
 
 
-
 newtype Hex a = Hex a
 
 instance (Integral a, Show a) => Show (Hex a) where
@@ -28,8 +27,8 @@ newtype Unicode = U Int
 
 -- | Difference in deriving stock and newtype
 newtype Test a = Test a
-  deriving stock Show
---  deriving newtype Show
+--  deriving stock Show
+  deriving newtype Show
 
 
 
