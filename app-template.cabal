@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 538fb662404b4e0e4f354dc222cd5a697868a1d3d982f45b730cd4408845c11e
+-- hash: 3734513fe760576ff96b1b2311b81c6fcdd81611e7e7bb5d076bfc00d52b0d7a
 
 name:           app-template
 version:        0.1.0.0
@@ -82,6 +82,7 @@ library
       Lenses.Lens
       Lenses.Lenses
       Lib
+      TypelevelMagic.Nats
   other-modules:
       Paths_app_template
   hs-source-dirs:
