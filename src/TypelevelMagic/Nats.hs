@@ -11,38 +11,29 @@
 
 module TypelevelMagic.Nats () where
 
-data Nat = Z | S Nat
-
-class KnownNat (n :: Nat) where getNat :: Nat
-instance KnownNat 'Z where getNat = Z
-instance KnownNat n => KnownNat ('S n) where getNat = S (getNat @n)
+data family Sing (n :: k)
 
 class SigI (a :: k) where
   sing :: Sing a
 
+data SomeSing k where
+  SomeSing :: forall k (n :: k) . SigI n => Sing n -> SomeSing k
+
+
+data Nat = Z | S Nat
+
 instance SigI 'Z where sing = SingZ
 instance SigI (n :: Nat) => SigI ('S n) where sing = SingS sing
-
-
-data family Sing (n :: k)
 
 data instance Sing (_ :: Nat) where
   SingZ :: Sing 'Z
   SingS :: Sing a -> Sing ('S a)
 
---sing :: forall n . KnownNat n => Sing n
---sing = case getNat @n of
---  Z -> SingZ
-
-data SomeSing k = forall (n :: k) . SigI n => SomeSing (Sing n)
 
 toSing :: Nat -> SomeSing Nat
 toSing Z = SomeSing SingZ
 toSing (S n) = case toSing n of
   SomeSing (a :: Sing nk) -> SomeSing (SingS a)
-
---withSigI :: SomeSing Nat -> (forall n . SigI n => Sing n -> r) -> r
---withSigI (SomeSing (s :: Sing (n :: Nat))) f = f s
 
 intToNat :: Int -> Nat
 intToNat 0 = Z
