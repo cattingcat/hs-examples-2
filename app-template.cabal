@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 3734513fe760576ff96b1b2311b81c6fcdd81611e7e7bb5d076bfc00d52b0d7a
+-- hash: 5ecc79b361a6e078a2f186833c553dc79953db7decc226d7625d81f615af2688
 
 name:           app-template
 version:        0.1.0.0
@@ -29,6 +29,11 @@ library
   exposed-modules:
       Design.ChurchFreeMonad
       Design.FM
+      Design.Freer.Extensibility
+      Design.Freer.FFree
+      Design.Freer.MtlMonads
+      Design.Freer.PerformanceImprove
+      Design.Freer.RWer
       Design.TF.Extensibility
       Design.TF.FirstOrderLang
       Design.TF.HigherOrderLang
