@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 5ecc79b361a6e078a2f186833c553dc79953db7decc226d7625d81f615af2688
+-- hash: 384d390c9dcb7ef1e3f3d115b356e810ef38076e0ea57341be42586d8a6ae7cd
 
 name:           app-template
 version:        0.1.0.0
@@ -48,6 +48,7 @@ library
       Extensions.DataKinds
       Extensions.DefaultSignatures
       Extensions.DeriveAnyClass
+      Extensions.DeriveGeneric
       Extensions.DeriveLift
       Extensions.DeriveLiftConsumer
       Extensions.DerivingVia

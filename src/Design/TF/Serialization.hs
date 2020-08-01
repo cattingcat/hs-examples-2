@@ -118,11 +118,12 @@ instance (ExpSym t, ExpSym (ExpHList ts)) => ExpSym (ExpHList (t ': ts)) where
       in ExpHList $ HCons (add le re) tl
 
 tst6 :: IO ()
-tst6 = case fromTree @(ExpHList [String, Int]) tst1 of
+tst6 = case fromTree @(ExpHList [String, Int, Tree]) tst1 of
   Left err -> putStrLn err
-  Right (ExpHList (HCons r1 (HCons r2 HNil)))  -> do
+  Right (ExpHList (HCons r1 (HCons r2 (HCons r3 HNil))))  -> do
     print $ view r1
     print $ eval r2
+    print $ r3
 
 
 -- | Extension

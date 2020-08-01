@@ -1,6 +1,8 @@
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE DerivingStrategies #-}
 {-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE RankNTypes #-}
 
 module Design.FM () where
 
@@ -41,8 +43,15 @@ data ReadLineF next where
 instance Functor ReadLineF where
   fmap f (Readl nxt) = Readl (f . nxt)
 
-interpretReadLine :: ReadLineF a -> IO a
+interpretReadLine :: ReadLineF a -> IO a 
 interpretReadLine (Readl nxt) = do
+  line <- getLine
+  pure $ nxt line
+  
+type f ~> g = forall a . f a -> g a
+
+interpretReadLine' :: ReadLineF ~> IO 
+interpretReadLine' (Readl nxt) = do
   line <- getLine
   pure $ nxt line
 

@@ -1,5 +1,6 @@
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE KindSignatures #-}
+{-# LANGUAGE InstanceSigs #-}
 
 module Design.Freer.FFree () where
 
@@ -23,7 +24,8 @@ instance Applicative (FFree f) where
   (Impure fa ff) <*> b = Impure fa (\a -> ff a <*> b)
 
 instance Monad (FFree f) where
-  (Pure a) >>= f = f a
+  (>>=) :: FFree f a -> (a -> FFree f b) -> FFree f b
+  (Pure a)      >>= f = f a
   (Impure a fa) >>= f = Impure a (fa >=> f)
 
 
@@ -38,6 +40,12 @@ get = Impure Get Pure
 
 put :: w -> RWer s w ()
 put a = Impure (Put a) Pure
+
+tst :: RWer Int Int Int 
+tst = do 
+  i <- get
+  put (i + i)
+  get  
 
 -- | It isn't possible to add more than one effect into FFree
 -- We have to extend @f@ in some way

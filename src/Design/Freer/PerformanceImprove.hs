@@ -20,6 +20,9 @@ import Control.Monad ((>=>))
 import GHC.TypeNats
 import Unsafe.Coerce (unsafeCoerce)
 import GHC.Natural (naturalToWord)
+import Data.Functor.Identity (Identity)
+import Control.Applicative (Const)
+import Data.Monoid (Sum(..))
 
 
 type family Has (a :: k) (as :: [k]) :: Bool where
@@ -46,7 +49,8 @@ class Member t r where
 
 instance (Has r rs ~ 'True, IdxOf r rs ~ n, KnownNat n) => Member r rs where
   inj v = MkUnion (naturalToWord $ natVal $ Proxy @n) (MkAny v)
-  prj (MkUnion indx (MkAny v)) =  if indx == naturalToWord (natVal $ Proxy @n)
+  prj (MkUnion indx (MkAny v)) =
+    if indx == naturalToWord (natVal $ Proxy @n)
     then Just (unsafeCoerce v)
     else Nothing
 
@@ -56,6 +60,8 @@ decomp u@(MkUnion n a) = let res :: Maybe (r x) = prj u
     Nothing -> Left $ MkUnion (n - 1) a
     Just r -> Right r
 
+tstUnion :: Union [Identity, Const Int, (,) String] Int
+tstUnion = inj ("", 55)
 
 
 
@@ -149,3 +155,32 @@ tst = runEff $ runReader 55 tstM
   where
     tstM :: Eff '[Reader Int] Int
     tstM = addGet 5
+
+
+data Writer w a where
+  Put :: w -> Writer w ()
+
+runWriter :: forall w r a . Monoid w => Eff (Writer w ': r) a -> Eff r (w, a)
+runWriter = loop
+  where
+    loop :: Eff (Writer w ': r) a -> Eff r (w, a)
+    loop (Pure a) = pure (mempty, a)
+    loop (Impure u q) = case decomp u of
+      Right (Put w) -> let
+        cont = qApp q ()
+        r = loop cont
+        in fmap (\(w', a) -> (w <> w', a)) r
+      Left o -> Impure o (qComp q loop)
+
+put :: Member (Writer w) r => w -> Eff r ()
+put w = Impure (inj (Put w)) (tsingleton Pure)
+
+rwApp :: Eff [Reader Int, Writer (Sum Int)] Int
+rwApp = do
+  i :: Int <- ask
+  put (Sum i <> Sum i)
+  _::Int <- if i > 0 then ask else pure 66
+  ask
+
+
+tstRwApp = runEff $ runWriter (runReader 999 rwApp)
