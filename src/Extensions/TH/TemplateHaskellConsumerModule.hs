@@ -45,3 +45,6 @@ tst7 = $(stringE . show =<< reify ''Bool)
 
 
 tst8 = $(listFields' ''Person)
+
+tst9 = [showQQ|tst8|]
+

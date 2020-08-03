@@ -2,6 +2,7 @@
 {-# LANGUAGE PartialTypeSignatures #-}
 {-# LANGUAGE DerivingStrategies #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
 
 module Lib
     ( someFunc
@@ -10,6 +11,7 @@ module Lib
 import Data.Kind (Type)
 import Control.Monad.Except
 import Control.Arrow
+import Control.Category
 
 someFunc :: IO ()
 someFunc = putStrLn "someFunc"
@@ -32,3 +34,8 @@ newtype MyKleisli err m a b = MkKyKleisli {runMyKleisli :: Kleisli (ExceptT err 
 
 --foldr (\x xs -> if x > 10 then [] else x:xs) [] [1..100]
 --foldl (\xs x -> if x > 10 then [] else x:xs) [] [1..100]
+
+
+class Category c => AMonad c m where
+  apure :: c a (m a)
+  abind :: c a (m b) -> c (m a) (m b)

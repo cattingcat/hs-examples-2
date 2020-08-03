@@ -9,6 +9,7 @@ module Extensions.TH.THLenses (
   fstLensTH,
   fstOfNLensTH,
   myQuoter,
+  showQQ,
 
   listFields',
   typeName
@@ -98,6 +99,9 @@ exprViaCtorName = pure $ AppE (ConE 'MyType) (LitE (StringL "qwe"))
 
 patternBrackets :: Q Pat -- PAttern matching
 patternBrackets = [p| (a, x:xs, _) |]
+
+typedBracket :: Q (TExp String)
+typedBracket = [|| "qwe" ||]
 
 -- | Custom parser-function
 --    Specific method depends on syntactic ctx
@@ -232,3 +236,21 @@ listFields' n = do
   list <- listFields n
   listE (map stringE list)
 
+
+-- | Using vars from outside via QQ
+showQQ :: QuasiQuoter
+showQQ = QuasiQuoter {
+    quoteExp  = compileExp,
+    quotePat  = err "pat",
+    quoteType = err "typ",
+    quoteDec  = err "dec"
+  }
+  where
+    compileExp :: String -> Q Exp
+    compileExp s = do
+      let name = dyn s
+--      let var = pure $ VarE (mkName s)
+      [e| show $name |]
+
+    err :: String -> String -> a
+    err thing s = error $ thing ++ " doesnt work with: " ++ s
