@@ -39,3 +39,5 @@ newtype MyKleisli err m a b = MkKyKleisli {runMyKleisli :: Kleisli (ExceptT err 
 class Category c => AMonad c m where
   apure :: c a (m a)
   abind :: c a (m b) -> c (m a) (m b)
+  
+  

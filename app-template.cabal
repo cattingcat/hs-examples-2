@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 384d390c9dcb7ef1e3f3d115b356e810ef38076e0ea57341be42586d8a6ae7cd
+-- hash: ad86105c7429afa0b5e26555936a82739ab5ef8c61635687db2dab53ed396bd4
 
 name:           app-template
 version:        0.1.0.0
@@ -83,6 +83,9 @@ library
       HsSyntax.Compose
       HsSyntax.EqualityConstraints
       HsSyntax.FixAndRec
+      ImplPar
+      IxMon
+      LazyCompose
       Lenses.AppLens
       Lenses.Composability
       Lenses.Lens

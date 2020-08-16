@@ -6,12 +6,15 @@
 {-# LANGUAGE MagicHash #-}
 {-# LANGUAGE KindSignatures #-}
 {-# LANGUAGE StandaloneKindSignatures #-}
+{-# LANGUAGE TypeOperators #-}
 
 module Extensions.ConstraintKinds () where
 
 import GHC.Base
 import GHC.Exts
 import Foreign.C (CInt(..))
+import Data.Proxy
+import GHC.TypeLits
 
 -- | Constraint in kinds
 type family IsTypeLit a where
@@ -57,3 +60,15 @@ type instance Typ Bool b = Num b
 
 func :: Typ a b => a -> b -> b
 func = undefined
+
+
+type family (:?) (a :: k) (ts :: [k]) :: Constraint where
+  (:?) _ '[] = TypeError ('Text "a not in ts")
+  (:?) k (k ': _) = ()
+  (:?) k (_ ': ks) = (:?) k ks
+
+foo :: (i :? ts) => i -> Proxy ts -> Bool
+foo _ _ = True
+
+tst1 = foo (55 :: Int) (Proxy :: Proxy [Int, String])
+--tst2 = foo (55 :: Integer) (Proxy :: Proxy [Int, String]) -- type error
