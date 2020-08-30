@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: ad86105c7429afa0b5e26555936a82739ab5ef8c61635687db2dab53ed396bd4
+-- hash: f77647d11ebd7f2423117edded251800d2f333a0fe0e273da7fe1227f73f0913
 
 name:           app-template
 version:        0.1.0.0
@@ -27,6 +27,13 @@ source-repository head
 
 library
   exposed-modules:
+      Books.HaskellInDepth.DocTests
+      Books.HaskellInDepth.Exceptions
+      Books.HaskellInDepth.MaybeMonad
+      Books.HaskellInDepth.Random
+      Books.HaskellInDepth.SizeCalculator
+      Books.HaskellInDepth.StateTst
+      Books.HaskellInDepth.WriterTst
       Design.ChurchFreeMonad
       Design.FM
       Design.Freer.Extensibility
@@ -34,6 +41,7 @@ library
       Design.Freer.MtlMonads
       Design.Freer.PerformanceImprove
       Design.Freer.RWer
+      Design.Hkd
       Design.TF.Extensibility
       Design.TF.FirstOrderLang
       Design.TF.HigherOrderLang
@@ -99,9 +107,20 @@ library
   ghc-options: -Weverything -Wcompat -Wno-safe -Wno-unused-top-binds -Wno-missing-import-lists -Wno-missing-safe-haskell-mode -Wno-implicit-prelude -Wno-unsafe -Wno-unused-packages
   build-depends:
       base >=4.7 && <5
+    , cond
+    , containers
+    , extra
+    , filepath
     , ghc-prim
     , mtl
+    , random
+    , record-hasfield
+    , relude
+    , safe
+    , safe-exceptions
     , template-haskell
+    , transformers
+    , unix-compat
   default-language: Haskell2010
 
 executable app-template-exe
@@ -114,15 +133,28 @@ executable app-template-exe
   build-depends:
       app-template
     , base >=4.7 && <5
+    , cond
+    , containers
+    , extra
+    , filepath
     , ghc-prim
     , mtl
+    , random
+    , record-hasfield
+    , relude
+    , safe
+    , safe-exceptions
     , template-haskell
+    , transformers
+    , unix-compat
   default-language: Haskell2010
 
 test-suite app-template-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
+      DocTest
+      TastyTest
       Paths_app_template
   hs-source-dirs:
       test
@@ -130,7 +162,22 @@ test-suite app-template-test
   build-depends:
       app-template
     , base >=4.7 && <5
+    , cond
+    , containers
+    , directory
+    , doctest
+    , extra
+    , filepath
     , ghc-prim
     , mtl
+    , random
+    , record-hasfield
+    , relude
+    , safe
+    , safe-exceptions
+    , tasty
+    , tasty-hspec
     , template-haskell
+    , transformers
+    , unix-compat
   default-language: Haskell2010

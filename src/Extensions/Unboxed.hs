@@ -38,3 +38,19 @@ data Dt = MkDt Int# Double#
 
 baz :: Dt -> Int
 baz (MkDt i _) = I# i
+
+levPolymorphFunc :: forall (r :: RuntimeRep). TYPE r -> Maybe# (TYPE r)
+levPolymorphFunc r = MkMaybe# (# r | #)
+
+maybePrim :: forall (r :: RuntimeRep) . Maybe# (TYPE r) -> TYPE r -> TYPE r
+maybePrim (MkMaybe# (# r | #))     _ = r
+maybePrim (MkMaybe# (# | (# #) #)) r = r
+
+
+
+data Shape = Rect Int Int | Circle Int
+data ShapeU = RectU Int# Int# | CircleU Int#
+newtype Shape# = MkShape# (# Int# | (# Int#, Int# #) #)
+newtype Shape2# = MkShape2# (# Int#, (# Int# | (# #) #) #)
+
+tst = Rect 1 2

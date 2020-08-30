@@ -21,9 +21,20 @@ description:         Please see the README on GitHub at <https://github.com/Gith
 
 dependencies:
 - base >= 4.7 && < 5
+- relude
+- containers
+- extra
+- safe
+- cond
+- safe-exceptions
 - ghc-prim
 - template-haskell
+- transformers
 - mtl
+- record-hasfield
+- random
+- unix-compat
+- filepath
 
 library:
   source-dirs: src
@@ -60,3 +71,7 @@ tests:
     - -with-rtsopts=-N
     dependencies:
     - app-template
+    - directory
+    - doctest
+    - tasty
+    - tasty-hspec

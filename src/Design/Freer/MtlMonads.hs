@@ -28,6 +28,6 @@ runReader a (Get fa) = runReader a (fa a)
 
 
 
-data RWer w s a = Pure a
-                | Get (s -> RWer w s a)
+data RWer w s a = Pure2 a
+                | Get2 (s -> RWer w s a)
                 | Put w (() -> RWer w s a) 
