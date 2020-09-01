@@ -8,9 +8,18 @@
 {-# LANGUAGE KindSignatures #-}
 {-# LANGUAGE PolyKinds #-}
 
-module Extensions.Unboxed () where
+module Extensions.Unboxed (
+  Shape(..),
+  ShapeU(..),
+  Shape#(..),
+  Shape2#(..),
+  s,
+  s',
+  mkRect,
+  mkRect'
+) where
 
-import GHC.Prim (Int#, Double#)
+import GHC.Prim (Int#, Double#, (*#))
 import GHC.Exts (TYPE)
 import GHC.Types (RuntimeRep(..), Int(I#))
 --import Data.Data (DataRep(IntRep))
@@ -53,4 +62,20 @@ data ShapeU = RectU Int# Int# | CircleU Int#
 newtype Shape# = MkShape# (# Int# | (# Int#, Int# #) #)
 newtype Shape2# = MkShape2# (# Int#, (# Int# | (# #) #) #)
 
-tst = Rect 1 2
+s :: Int -> Int -> Int 
+s x y = let shape = Rect x y in
+  case shape of 
+    Rect a b -> a * b
+    Circle r -> 3 * r * r 
+    
+s' :: Int -> Int -> Int 
+s' (I# x) (I# y) = let shape = MkShape2# (# x, (# y | #) #) in
+  case shape of 
+    MkShape2# (# a, (# b | #) #) -> I# (a *# b)
+    MkShape2# (# r, (#| _ #) #) -> I# (3# *# r *# r) 
+    
+mkRect :: Int -> Int -> Shape 
+mkRect = Rect
+
+mkRect' :: Int -> Int -> Shape2# 
+mkRect' (I# x) (I# y) = MkShape2# (# x, (# y | #) #)

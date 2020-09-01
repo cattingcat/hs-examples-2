@@ -16,7 +16,6 @@ module Design.TF.Serialization () where
 import Design.TF.FirstOrderLang
 import Design.TF.Extensibility
 import Extensions.DataKinds
-import Data.Kind
 
 fix :: (a -> a) -> a
 fix f = f (fix f)
@@ -67,7 +66,7 @@ tst3 = case fromTree tst1 of
 newtype Wrapped = Wrapped (forall repr . ExpSym repr => repr)
 
 fromTreeWrapped :: Tree -> Either ErrMsg Wrapped
-fromTreeWrapped t = undefined -- Wrapped <$> (fromTree @r t)
+fromTreeWrapped _ = undefined -- Wrapped <$> (fromTree @r t)
 
 tst4 :: IO ()
 tst4 = case fromTreeWrapped tst1 of
@@ -123,7 +122,7 @@ tst6 = case fromTree @(ExpHList [String, Int, Tree]) tst1 of
   Right (ExpHList (HCons r1 (HCons r2 (HCons r3 HNil))))  -> do
     print $ view r1
     print $ eval r2
-    print $ r3
+    print   r3
 
 
 -- | Extension

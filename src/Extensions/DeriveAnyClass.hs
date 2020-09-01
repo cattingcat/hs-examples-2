@@ -23,7 +23,7 @@ data Foo a = Foo a a
 
 class Sizable a where
   type Size a
-  type Size a = Int
+  type Size _ = Int
 
 data Bar = Bar 
   deriving anyclass Sizable

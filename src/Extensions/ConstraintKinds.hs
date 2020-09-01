@@ -4,7 +4,6 @@
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE MagicHash #-}
-{-# LANGUAGE KindSignatures #-}
 {-# LANGUAGE StandaloneKindSignatures #-}
 {-# LANGUAGE TypeOperators #-}
 
@@ -12,7 +11,6 @@ module Extensions.ConstraintKinds () where
 
 import GHC.Base
 import GHC.Exts
-import Foreign.C (CInt(..))
 import Data.Proxy
 import GHC.TypeLits
 
@@ -20,7 +18,7 @@ import GHC.TypeLits
 type family IsTypeLit a where
   IsTypeLit Nat    = 'True
   IsTypeLit Symbol = 'True
-  IsTypeLit a      = 'False
+  IsTypeLit _      = 'False
 
 data T :: forall a. (IsTypeLit a ~ 'True) => a -> Type where
   MkNat    :: T 42

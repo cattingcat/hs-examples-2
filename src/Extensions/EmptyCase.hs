@@ -1,8 +1,7 @@
 {-# LANGUAGE EmptyCase #-}
 {-# LANGUAGE ImportQualifiedPost #-}
-module Extensions.EmptyCase where
+module Extensions.EmptyCase () where
 
-import GHC.Prim qualified as P
 import Data.Void (Void)
 
 data MyData = A | B

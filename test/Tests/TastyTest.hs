@@ -1,4 +1,4 @@
-module TastyTest (main) where
+module Tests.TastyTest (main) where
 import Test.Tasty
 import Test.Tasty.Hspec
 
