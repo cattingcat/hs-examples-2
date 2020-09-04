@@ -49,6 +49,7 @@ library:
     - -Wno-implicit-prelude
     - -Wno-unsafe
     - -Wno-unused-packages
+    - -funbox-strict-fields
 
 executables:
   app-template-exe:

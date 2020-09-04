@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 275732758b872458591e4b081081fe058574067a5cf86d5635ba49e5f9aa6e6d
+-- hash: 05510f9a62ca8b02afe1eaa531867db21e4453ee698a0384f9b803cc0a169cd8
 
 name:           app-template
 version:        0.1.0.0
@@ -37,7 +37,9 @@ library
       Books.HaskellInDepth.StateTst
       Books.HaskellInDepth.TypeFamily
       Books.HaskellInDepth.WriterTst
+      CodeWars.BefungeInterpreter
       Design.ChurchFreeMonad
+      Design.Cps
       Design.FM
       Design.Freer.Extensibility
       Design.Freer.FFree
@@ -107,7 +109,7 @@ library
       Paths_app_template
   hs-source-dirs:
       src
-  ghc-options: -Weverything -Wcompat -Wno-safe -Wno-unused-top-binds -Wno-missing-import-lists -Wno-missing-safe-haskell-mode -Wno-implicit-prelude -Wno-unsafe -Wno-unused-packages
+  ghc-options: -Weverything -Wcompat -Wno-safe -Wno-unused-top-binds -Wno-missing-import-lists -Wno-missing-safe-haskell-mode -Wno-implicit-prelude -Wno-unsafe -Wno-unused-packages -funbox-strict-fields
   build-depends:
       base >=4.7 && <5
     , cond
