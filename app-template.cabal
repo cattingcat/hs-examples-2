@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 05510f9a62ca8b02afe1eaa531867db21e4453ee698a0384f9b803cc0a169cd8
+-- hash: 012c7ab085036ff09b476ecf44357062baacbb00eca06d3e837ca95b7497ef78
 
 name:           app-template
 version:        0.1.0.0
@@ -47,6 +47,8 @@ library
       Design.Freer.PerformanceImprove
       Design.Freer.RWer
       Design.Hkd
+      Design.RecScheme
+      Design.RecursionSchemes
       Design.TF.Extensibility
       Design.TF.FirstOrderLang
       Design.TF.HigherOrderLang
