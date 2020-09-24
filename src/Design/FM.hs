@@ -6,6 +6,8 @@
 
 module Design.FM () where
 
+-- http://www.haskellforall.com/2012/06/you-could-have-invented-free-monads.html
+-- http://okmij.org/ftp/Computation/free-monad.html
 
 data LogLevel = Info | Warn | Err
   deriving stock Show

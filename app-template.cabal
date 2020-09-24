@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 012c7ab085036ff09b476ecf44357062baacbb00eca06d3e837ca95b7497ef78
+-- hash: 9d22283fa6b7113a2be4c573f94333e91c103af261ee96069bb3c29c5a2f1e52
 
 name:           app-template
 version:        0.1.0.0
@@ -38,6 +38,7 @@ library
       Books.HaskellInDepth.TypeFamily
       Books.HaskellInDepth.WriterTst
       CodeWars.BefungeInterpreter
+      Design.Arrows
       Design.ChurchFreeMonad
       Design.Cps
       Design.FM
@@ -103,10 +104,15 @@ library
       LazyCompose
       Lenses.AppLens
       Lenses.Composability
+      Lenses.GenericLensTest
       Lenses.Lens
       Lenses.Lenses
       Lib
+      SOP.TestSOP
       TypelevelMagic.Nats
+      TypelevelMagic.Simgletons
+      Uniplate.TestTypeable
+      Uniplate.TestUniplate
   other-modules:
       Paths_app_template
   hs-source-dirs:
@@ -119,8 +125,11 @@ library
     , directory
     , extra
     , filepath
+    , generic-lens
     , ghc-prim
+    , lens
     , mtl
+    , profunctors
     , random
     , record-hasfield
     , relude
@@ -128,6 +137,7 @@ library
     , safe-exceptions
     , template-haskell
     , transformers
+    , uniplate
     , unix-compat
   default-language: Haskell2010
 
@@ -146,8 +156,11 @@ executable app-template-exe
     , directory
     , extra
     , filepath
+    , generic-lens
     , ghc-prim
+    , lens
     , mtl
+    , profunctors
     , random
     , record-hasfield
     , relude
@@ -155,6 +168,7 @@ executable app-template-exe
     , safe-exceptions
     , template-haskell
     , transformers
+    , uniplate
     , unix-compat
   default-language: Haskell2010
 
@@ -173,8 +187,11 @@ executable simulation
     , directory
     , extra
     , filepath
+    , generic-lens
     , ghc-prim
+    , lens
     , mtl
+    , profunctors
     , random
     , record-hasfield
     , relude
@@ -182,6 +199,7 @@ executable simulation
     , safe-exceptions
     , template-haskell
     , transformers
+    , uniplate
     , unix-compat
   default-language: Haskell2010
 
@@ -204,8 +222,11 @@ test-suite app-template-test
     , doctest
     , extra
     , filepath
+    , generic-lens
     , ghc-prim
+    , lens
     , mtl
+    , profunctors
     , random
     , record-hasfield
     , relude
@@ -215,6 +236,7 @@ test-suite app-template-test
     , tasty-hspec
     , template-haskell
     , transformers
+    , uniplate
     , unix-compat
   default-language: Haskell2010
 
@@ -234,8 +256,11 @@ benchmark app-template-bench
     , directory
     , extra
     , filepath
+    , generic-lens
     , ghc-prim
+    , lens
     , mtl
+    , profunctors
     , random
     , record-hasfield
     , relude
@@ -243,5 +268,6 @@ benchmark app-template-bench
     , safe-exceptions
     , template-haskell
     , transformers
+    , uniplate
     , unix-compat
   default-language: Haskell2010

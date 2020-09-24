@@ -36,6 +36,10 @@ dependencies:
 - unix-compat
 - filepath
 - directory
+- profunctors
+- uniplate
+- generic-lens
+- lens
 
 library:
   source-dirs: src
