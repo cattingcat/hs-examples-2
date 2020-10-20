@@ -1,0 +1,16 @@
+cradle:
+  stack:
+    - path: "./src"
+      component: "app-template:lib"
+
+    - path: "./app/Main.hs"
+      component: "app-template:exe:app-template-exe"
+
+    - path: "./simulations/Main.hs"
+      component: "app-template:exe:simulation"
+
+    - path: "./test"
+      component: "app-template:test:app-template-test"
+
+    - path: "./benchmarks/Main.hs"
+      component: "app-template:bench:app-template-bench"

@@ -19,11 +19,11 @@
 module Extensions.DeriveGeneric () where
 
 import GHC.Generics
-import GHC.OverloadedLabels
-import GHC.Base
-import Control.Monad.Identity
+import GHC.OverloadedLabels ( IsLabel(..) )
+import GHC.Base ( Type, Symbol )
+import Control.Monad.Identity ( Identity(..) )
 import Data.Function ((&))
-import Data.Functor.Const
+import Data.Functor.Const ( Const(..) )
 
 
 type family  HasFieldP (field :: Symbol) (t :: k -> Type) :: Maybe Type where

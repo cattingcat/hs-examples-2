@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 03c819e23ede0ceb4b48df7b8bfd05eab9b10a76f716a3b5009a18b47d88b5dd
+-- hash: 2002091df5282c355205b105c24282608048e94d6a1fc3a104ee32e06eff458c
 
 name:           app-template
 version:        0.1.0.0
@@ -109,6 +109,8 @@ library
       Lenses.GenericLensTest
       Lenses.Lens
       Lenses.Lenses
+      Lenses.OneMoreAttempt.Lens
+      Lenses.OneMoreAttempt.Test
       Lib
       SOP.TestSOP
       TypelevelMagic.Nats
