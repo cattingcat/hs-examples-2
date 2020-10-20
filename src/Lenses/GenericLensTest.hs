@@ -4,18 +4,14 @@
 {-# LANGUAGE DuplicateRecordFields     #-}
 {-# LANGUAGE FlexibleContexts          #-}
 {-# LANGUAGE NoMonomorphismRestriction #-}
-{-# LANGUAGE TypeApplications          #-}
-{-# LANGUAGE DerivingStrategies #-}
-{-# LANGUAGE OverloadedLabels #-}
-{-# LANGUAGE PackageImports #-}
+{-# LANGUAGE DerivingStrategies        #-}
+{-# LANGUAGE OverloadedLabels          #-}
 
 module Lenses.GenericLensTest () where
 
 import GHC.Generics (Generic)
 import Data.Generics.Labels ()
-import Data.Generics.Product
 import Control.Lens
-import Control.Arrow
 
 
 data AnotherData = AnotherData
@@ -40,6 +36,7 @@ tst2 = #tstId .~ 33 obj -- setter 1
 tst3 = obj & #tstId .~ 33 -- setter 2
 
 tst4 = obj & #tstName %~ (<> "!!!") -- modify
+tst4' = obj & #tstName <>~ "!!!" -- modify
 
 tst5 = obj & #anotherData %~ #anotherInt .~ 4234 -- modify nested
 
@@ -51,4 +48,18 @@ tst6 = obj              -- complex update
 -- complex get
 tst7 = obj ^. #anotherData . #anotherInt
 
-tst8 = obj & #tstName %%~ (\s -> putStrLn s >> pure "set") 
+tst8 = obj & #tstName %%~ (\s -> putStrLn s >> pure "set")
+
+tst9 = [obj, obj, obj] ^.. (each . #tstId)
+tst10 = [obj, obj, obj] ^.. (ix 2 . #tstId)
+tst11 = [[1], [2, 3]] ^.. to concat
+
+tst12 = [obj, obj, obj] ^.. each . to foo
+  where
+    foo :: TstData -> [Int]
+    foo d = let a = d ^. #tstId in [a, a]
+
+tst13 = [obj, obj, obj] ^.. ((each . to foo) . #_Just)
+  where
+    foo :: TstData -> Maybe Int
+    foo d = Just $ d ^. #tstId

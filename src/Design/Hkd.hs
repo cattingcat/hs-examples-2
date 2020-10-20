@@ -7,6 +7,7 @@
 {-# LANGUAGE ImportQualifiedPost #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE UndecidableInstances #-}
 
 
 module Design.Hkd () where
@@ -28,8 +29,9 @@ data MyRecord f = MyRecord
   }
 
 --instance Z.HasField "hello" (MyRecord f) (C f String) where
-instance Z.HasField "hello" (MyRecord Identity) String where
-
+--instance Z.HasField "hello" (MyRecord Identity) String where
+instance (a ~ C f String) => Z.HasField "hello" (MyRecord f) a where
+  hasField r@(MyRecord h _) = (\h' -> r{hello = h'}, h)
 
 tstObj :: MyRecord Identity
 tstObj = MyRecord "hell" 444
