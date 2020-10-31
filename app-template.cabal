@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 2002091df5282c355205b105c24282608048e94d6a1fc3a104ee32e06eff458c
+-- hash: 6788b5b2593d33bf2f6c4851914091b8c3f17a2e2c1c43a1ec75ff614c8c7553
 
 name:           app-template
 version:        0.1.0.0
@@ -27,6 +27,7 @@ source-repository head
 
 library
   exposed-modules:
+      Alga.Test
       Books.HaskellInDepth.BenchFuncs
       Books.HaskellInDepth.DataFamily
       Books.HaskellInDepth.DocTests
@@ -123,9 +124,11 @@ library
       src
   ghc-options: -Weverything -Wcompat -Wno-safe -Wno-unused-top-binds -Wno-missing-import-lists -Wno-missing-safe-haskell-mode -Wno-implicit-prelude -Wno-unsafe -Wno-unused-packages -funbox-strict-fields
   build-depends:
-      base >=4.7 && <5
+      algebraic-graphs
+    , base >=4.14
     , cond
     , containers
+    , contravariant
     , directory
     , extra
     , filepath
@@ -135,6 +138,7 @@ library
     , mtl
     , profunctors
     , random
+    , record-dot-preprocessor
     , record-hasfield
     , relude
     , safe
@@ -153,10 +157,12 @@ executable app-template-exe
       app
   ghc-options: -threaded -rtsopts -with-rtsopts=-N -Wall
   build-depends:
-      app-template
-    , base >=4.7 && <5
+      algebraic-graphs
+    , app-template
+    , base >=4.14
     , cond
     , containers
+    , contravariant
     , directory
     , extra
     , filepath
@@ -166,6 +172,7 @@ executable app-template-exe
     , mtl
     , profunctors
     , random
+    , record-dot-preprocessor
     , record-hasfield
     , relude
     , safe
@@ -184,10 +191,12 @@ executable simulation
       simulations
   ghc-options: -threaded -rtsopts -with-rtsopts=-N -Wall
   build-depends:
-      app-template
-    , base >=4.7 && <5
+      algebraic-graphs
+    , app-template
+    , base >=4.14
     , cond
     , containers
+    , contravariant
     , directory
     , extra
     , filepath
@@ -197,6 +206,7 @@ executable simulation
     , mtl
     , profunctors
     , random
+    , record-dot-preprocessor
     , record-hasfield
     , relude
     , safe
@@ -218,10 +228,12 @@ test-suite app-template-test
       test
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      app-template
-    , base >=4.7 && <5
+      algebraic-graphs
+    , app-template
+    , base >=4.14
     , cond
     , containers
+    , contravariant
     , directory
     , doctest
     , extra
@@ -232,6 +244,7 @@ test-suite app-template-test
     , mtl
     , profunctors
     , random
+    , record-dot-preprocessor
     , record-hasfield
     , relude
     , safe
@@ -252,10 +265,12 @@ benchmark app-template-bench
   hs-source-dirs:
       benchmarks
   build-depends:
-      app-template
-    , base >=4.7 && <5
+      algebraic-graphs
+    , app-template
+    , base >=4.14
     , cond
     , containers
+    , contravariant
     , criterion
     , directory
     , extra
@@ -266,6 +281,7 @@ benchmark app-template-bench
     , mtl
     , profunctors
     , random
+    , record-dot-preprocessor
     , record-hasfield
     , relude
     , safe

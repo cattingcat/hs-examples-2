@@ -28,12 +28,14 @@ import Data.Functor.Const
 import Data.Functor.Identity
 import GHC.TypeLits (Symbol)
 import Data.Functor ((<&>))
+import Data.Functor.Contravariant 
 import Data.Monoid ( First(..) )
 import Data.Semigroup ( Endo(..) )
 import Data.Monoid ( Any(..) )
 import Data.Function ((&))
 import Data.Monoid (Product(..))
 import Data.Coerce (coerce)
+import Data.Profunctor (Profunctor)
 
 type Lens s t a b = forall f . Functor f => (a -> f b) -> (s -> f t)
 
@@ -138,7 +140,7 @@ _head _ [] = pure []
 _head f (a:as) = (:) <$> f a <*> pure as
 _last _ [] = pure []
 _last f [a] = (:[]) <$> f a
-_last f (a:as) = (:) <$> pure a <*> _last f as
+_last f (a:as) = (a:) <$> _last f as
 
 filtered :: (a -> Bool) -> Traversal' [a] a 
 filtered p f [] = pure []
@@ -327,3 +329,12 @@ tstTo :: [String]
 tstTo = tstList ^.. (each . to show)
 
 tstAct = tstList ^! (each . to show . act putStrLn)
+
+tstTo2 :: Int
+tstTo2 = tstList ^. to length
+
+
+tst = tstData ^. (#dataId . to show {-. act putStrLn-})
+
+coerce' :: (Functor f, Contravariant f) => f a -> f b
+coerce' = contramap (const ()) . fmap (const ()) 

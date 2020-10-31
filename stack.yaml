@@ -1,7 +1,7 @@
 # https://docs.haskellstack.org/en/stable/yaml_configuration/
 
 
-resolver: nightly-2020-10-16
+resolver: nightly-2020-10-20
 #resolver: ghc-8.10.1
 #resolver: lts-16.12
 #resolver: ghc-8.12
