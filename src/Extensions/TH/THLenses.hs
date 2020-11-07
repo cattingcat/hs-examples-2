@@ -21,6 +21,9 @@ import Language.Haskell.TH.Quote
 import Lenses.Composability
 
 
+-- | Tutor:
+-- https://markkarpov.com/tutorial/th.html
+
 --map2 :: (a -> b) -> [a] -> [b]
 --map2 f (x : xs) = f x : map2 f xs
 --map2 _ [] = []
@@ -204,6 +207,7 @@ fstOfNLensTH name n = do
 
 
 -- | Retrieve info about type
+--  Name always in scope
 typeName :: Name -> Q Exp
 typeName n = do
   info <- reify n
@@ -213,7 +217,7 @@ typeName n = do
 
 listFields :: Name -> Q [String]
 listFields dataName = do
-  info <- reify dataName
+  info <- reify dataName -- reify - get info about Name
   case info of
     TyConI (DataD _ _ _ _ cons _) -> processCons cons
     _ -> pure []
