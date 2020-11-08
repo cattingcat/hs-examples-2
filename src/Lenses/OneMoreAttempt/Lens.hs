@@ -16,26 +16,17 @@
 {-# LANGUAGE DerivingStrategies #-}
 {-# OPTIONS_GHC -Wno-orphans        #-}
 
-module Lenses.OneMoreAttempt.Lens 
-    ( Lens
-    , Lens'
-    , LensLike
-    , LensLike'
-    ) 
-where 
-import GHC.OverloadedLabels ( IsLabel(..) )
+module Lenses.OneMoreAttempt.Lens where 
 import Data.Functor.Const
 import Data.Functor.Identity
-import GHC.TypeLits (Symbol)
 import Data.Functor ((<&>))
-import Data.Functor.Contravariant 
 import Data.Monoid ( First(..) )
 import Data.Semigroup ( Endo(..) )
 import Data.Monoid ( Any(..) )
 import Data.Function ((&))
-import Data.Monoid (Product(..))
-import Data.Coerce (coerce)
-import Data.Profunctor (Profunctor)
+import Data.Profunctor
+import Data.Tagged
+import GHC.Natural
 
 type Lens s t a b = forall f . Functor f => (a -> f b) -> (s -> f t)
 
@@ -50,12 +41,6 @@ type Getting r s a = LensLike' (Const r) s a
 type Setting s t a b = LensLike Identity s t a b
 
 
-
-class FieldLens (name :: Symbol) s a | s name -> a where
-  fieldLens :: Lens' s a
-
-instance (Functor f, FieldLens name s a) => IsLabel name (LensLike' f s a) where
-  fromLabel = fieldLens @name @s @a
 
 ix :: Int -> Lens [a] [a] a a
 ix 0 f (a:as) = f a <&> (:as)
@@ -140,7 +125,7 @@ _head _ [] = pure []
 _head f (a:as) = (:) <$> f a <*> pure as
 _last _ [] = pure []
 _last f [a] = (:[]) <$> f a
-_last f (a:as) = (a:) <$> _last f as
+_last f (a:as) = (:) <$> pure a <*> _last f as
 
 filtered :: (a -> Bool) -> Traversal' [a] a 
 filtered p f [] = pure []
@@ -219,122 +204,143 @@ act :: Monad m => (s -> m a) -> Action m s a
 act f g s = Const (f s >>= \a -> getConst (g a))
 
 
-data MyTestData = MyTestData 
-    { dataId :: Int
-    , dataName :: String
-    , dataT :: (String, Int)
-    }
-    deriving stock (Show)
 
-instance FieldLens "dataId" MyTestData Int where 
-    fieldLens f d = (\i -> d{dataId = i}) <$> f (dataId d)
+-- | Isomorphism:
+-- Iso' s a  -  means 's' and 'a' are isomorphic
+-- so we have (a -> s) and (s -> a)
+-- Primitive approach:
+--    type Iso s t a b = (s -> a, b -> t)
+-- Less primitive approach:
+--    type Iso s t a b = Functor f => (a -> f b) <-> (s -> f t)
+--    where (<->) - bidirectional arrow
+--
+--    class Isomorphic k where
+--      ... 
+--    type Iso s t a b = (Isomorphic k, Functor f) => k (a -> f b) (s -> f t)
 
+-- type Iso s t a b = forall p . Profunctor p => p a b -> p s t
+type Iso' s a = Iso s s a a 
 
+type Iso s t a b = forall p f . (Profunctor p, Functor f) => p a (f b) -> p s (f t)
 
-tstData :: MyTestData
-tstData = MyTestData 23 "qwe" ("asd", 55)
+iso :: (s -> a) -> (b -> t) -> Iso s t a b
+iso sa bt = dimap sa (fmap bt)
 
-foo :: Lens' MyTestData Int -> MyTestData -> Int
-foo l d = unF (l f d)
-    where 
-        f :: Int -> Const Int Int
-        f i = Const i
-        unF :: Const Int MyTestData -> Int
-        unF = getConst
-    
-tst1 = foo #dataId tstData
+from :: Iso s t a b -> Iso b a t s
+from iso = dimap (b2t iso) (fmap $ s2a iso)
 
+enum :: Enum a => Iso' Int a
+enum = iso toEnum fromEnum
 
+data Exchange a b s t = Exchange (s -> a) (b -> t)
+instance Profunctor (Exchange s t) where 
+  dimap m cm (Exchange f g) = Exchange (f . m) (cm . g) 
 
-tstOver :: MyTestData
-tstOver = over #dataId (+1) tstData
+from2 :: Iso s t a b -> Iso b a t s
+from2 iso t2fs = 
+  -- f :: s -> a
+  -- g :: f b -> f t
+  -- r :: b  --p>  f a
+  let Exchange f g = iso (Exchange (\a -> a) (\fb -> fb)) 
+    in dimap (runIdentity . g . Identity) (fmap f) t2fs
 
-tstSet :: MyTestData
-tstSet = set' #dataId (1 :: Int) tstData
+-- newtype Forget r a b = Forget { runForget :: a -> r }
 
-tstSetIx :: [Int]
-tstSetIx = set' (ix 5) 666 [1,2,3,4,5,6,7,8,9,0]
+s2a :: Iso s t a b -> (s -> a)
+s2a iso s = runForget (iso f) s
+  where 
+    f :: Forget a a (Identity b)
+    f = Forget id
 
-tstView :: Int
-tstView = view #dataId tstData
-
-tstNewValGet :: (Int, MyTestData)
-tstNewValGet = (#dataId <%- (+1)) tstData
-
-
-tstList :: [Int]
-tstList =[1,2,3,4,5,6,3,7,8,9,3,7,6,5,3,5,6,7]
-
-tstSetAll :: [Int]
-tstSetAll = set' (_all 3) 666 tstList
-
--- Here we need monoid instance for first element of Const
--- tstViewAll = view (_all 3) tstList
-
-tstListOf :: [Int]
-tstListOf = toListOf (_all 3) tstList
-
-tstListOf' :: [Int]
-tstListOf' = toListOf' (_all 3) tstList
-
-tstPreview :: Maybe Int
-tstPreview = preview (_all 3) tstList
-
-tstEach :: [String]
-tstEach = over each (show) tstList
-
-tstLast :: [Int]
-tstLast = over _last (const 666) tstList
-
-tstHas :: Bool
-tstHas = has (_all 399) tstList
-
-tstViewOp = tstData ^. #dataId
-
-tstOverOp :: MyTestData
-tstOverOp = tstData & #dataId %~ (+666)
-
-tstSetOp :: (Int, Int)
-tstSetOp = (0, 0) & _1 .~ 666
-                  & _2 .~ 777
-
-tstSetMonoid :: [Product Int]
-tstSetMonoid =  (coerce tstList) & ix 2 <>~ (Product 666)
-
-tstToListOp :: [Int]
-tstToListOp = tstList ^.. filtered (> 6)
-
-tstToListOpMod :: [MyTestData]
-tstToListOpMod = [tstData, tstData, tstData] ^.. each
-
-tstComp :: Int
-tstComp = [[1,2,3], [4,5,6], [7,8,9]] ^. (ix 1 . ix 2)
-
-tstComp2 :: Int
-tstComp2 = [tstData, tstData, tstData] ^. (ix 1 . #dataId)
-
-tstComp3 :: [MyTestData]
-tstComp3 = [tstData, tstData, tstData] & (ix 1 . #dataId) %~ (+543)
-
-tstComp4 :: [MyTestData]
-tstComp4 = [tstData, tstData, tstData] & (each . #dataId) %~ (+543)
-
-tstTakingSet :: [Int]
-tstTakingSet = tstList & (taking 5) .~ (55 :: Int)
-
-tstTakingGet :: [Int]
-tstTakingGet = tstList ^.. taking 5
-
-tstTo :: [String]
-tstTo = tstList ^.. (each . to show)
-
-tstAct = tstList ^! (each . to show . act putStrLn)
-
-tstTo2 :: Int
-tstTo2 = tstList ^. to length
+b2t :: Iso s t a b -> (b -> t)
+b2t iso b = runIdentity $ unTagged $ iso (Tagged (Identity b))
 
 
-tst = tstData ^. (#dataId . to show {-. act putStrLn-})
 
-coerce' :: (Functor f, Contravariant f) => f a -> f b
-coerce' = contramap (const ()) . fmap (const ()) 
+-- | A lens describes something isomorphic to a product with some extra context. 
+--  A lens from s to a indicates there exists c such that s is isomorphic to (c, a).
+--  get :: s -> a
+--  put :: s -> a -> s
+--  lens :: s -> (a, a -> s)
+
+-- | On the other hand, a prism from s to a indicates there exists c such that s 
+--  is isomorphic to (Either c a).
+--  get :: s -> Maybe a
+--  put :: a -> s
+prismNat :: (Integer -> Maybe Natural, Natural -> Integer)
+prismNat = (toNatural, toInteger)
+  where 
+    toNatural n = if n >= 0 then Just (fromInteger n) else Nothing
+
+-- _Left :: Prism (Either a c) (Either b c) a b
+    -- get_Left :: Either a b -> Maybe a
+    -- get_Left (Left a) = Just a
+    -- get_Left _ = Nothing
+
+    -- put_Left :: a -> Either a b
+    -- put_Left = Left
+
+    -- modifyLeft :: (a -> b) -> Either a c -> Either b c
+    -- modifyLeft f e = case get_Left e of 
+    --     Nothing -> undefined -- e, impossible to return e
+    --     Just a -> put_Left (f a)
+get_Left :: Either a b -> Either (Either _1 b) a
+get_Left (Left a) = Right a
+get_Left (Right b) = Left (Right b)
+
+put_Left :: a -> Either a _1
+put_Left = Left
+
+modifyLeft :: (a -> b) -> Either a c -> Either b c
+modifyLeft f e = case get_Left e of 
+    Left l -> l
+    Right a -> put_Left (f a)
+
+
+type Prism s t a b = forall p f . (Choice p, Applicative f) => p a (f b) -> p s (f t)
+type Prism' s a = Prism s s a a
+
+type AReview t b = Tagged b (Identity b) -> Tagged t (Identity t)
+
+review :: AReview t b -> b -> t
+review r = runIdentity . unTagged . r . Tagged . Identity
+
+prism' :: (a -> s) -> (s -> Maybe a) -> Prism' s a
+prism' put get apfa = let
+  -- t :: p (Either c a) (Either c (f a))
+  t = right' apfa
+
+  -- g :: p s s 
+  g = dimap f1 f2 t
+
+  -- f1 :: s -> Either c a
+  f1 s = case get s of 
+      Just a -> Right a
+      Nothing -> Left s
+
+  -- f2 :: Either s (f a) -> s
+  f2 (Left s) = pure s
+  f2 (Right fa) = fmap put fa
+
+
+  in g
+
+prism :: (b -> t) -> (s -> Either t a) -> Prism s t a b
+prism put get apfb = let 
+  -- t :: p (Either t a) (Either t (f b))
+  t = right' apfb
+
+  g = dimap f1 f2 t
+
+  -- f1 :: s -> Either t a
+  f1 = get
+
+  -- f2 :: Either t (f b) -> (f t)
+  f2 = either pure (fmap put)
+  in g
+
+
+type L p f s t a b = p a (f b) -> p s (f t)
+type Lens_ s t a b = forall f . Functor f => L (->) f s t a b
+type Traversal_ s t a b = forall f . Applicative f => L (->) f s t a b
+type Iso_ s t a b = forall p f . (Profunctor p, Functor f) => L (->) f s t a b

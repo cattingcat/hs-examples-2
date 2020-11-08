@@ -1,10 +1,10 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.33.0.
+-- This file has been generated from package.yaml by hpack version 0.34.2.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 6788b5b2593d33bf2f6c4851914091b8c3f17a2e2c1c43a1ec75ff614c8c7553
+-- hash: 233f58d68fd2188e76f7af2af84a365e59ae1e89562c96bd3eb0349eb5dbfa68
 
 name:           app-template
 version:        0.1.0.0
@@ -87,7 +87,6 @@ library
       Extensions.ScopedTypeVariables
       Extensions.StandaloneDeriving
       Extensions.StandaloneKindSignatures
-      Extensions.TH.LensExample
       Extensions.TH.TemplateHaskell
       Extensions.TH.TemplateHaskellConsumerModule
       Extensions.TH.THLenses
@@ -143,6 +142,7 @@ library
     , relude
     , safe
     , safe-exceptions
+    , tagged
     , template-haskell
     , transformers
     , uniplate
@@ -177,6 +177,7 @@ executable app-template-exe
     , relude
     , safe
     , safe-exceptions
+    , tagged
     , template-haskell
     , transformers
     , uniplate
@@ -211,6 +212,7 @@ executable simulation
     , relude
     , safe
     , safe-exceptions
+    , tagged
     , template-haskell
     , transformers
     , uniplate
@@ -249,6 +251,7 @@ test-suite app-template-test
     , relude
     , safe
     , safe-exceptions
+    , tagged
     , tasty
     , tasty-hspec
     , template-haskell
@@ -286,6 +289,7 @@ benchmark app-template-bench
     , relude
     , safe
     , safe-exceptions
+    , tagged
     , template-haskell
     , transformers
     , uniplate

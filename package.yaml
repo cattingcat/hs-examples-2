@@ -37,6 +37,7 @@ dependencies:
 - filepath
 - directory
 - profunctors
+- tagged
 - contravariant
 - uniplate
 - generic-lens
