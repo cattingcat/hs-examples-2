@@ -1,3 +1,5 @@
+{-# LANGUAGE ViewPatterns #-}
+{-# LANGUAGE InstanceSigs #-}
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE DefaultSignatures #-}
 {-# LANGUAGE TypeOperators #-}
@@ -270,6 +272,7 @@ b2t iso b = runIdentity $ unTagged $ iso (Tagged (Identity b))
 prismNat :: (Integer -> Maybe Natural, Natural -> Integer)
 prismNat = (toNatural, toInteger)
   where 
+    toNatural :: Integer -> Maybe Natural
     toNatural n = if n >= 0 then Just (fromInteger n) else Nothing
 
 -- _Left :: Prism (Either a c) (Either b c) a b
@@ -307,18 +310,18 @@ review r = runIdentity . unTagged . r . Tagged . Identity
 
 prism' :: (a -> s) -> (s -> Maybe a) -> Prism' s a
 prism' put get apfa = let
-  -- t :: p (Either c a) (Either c (f a))
+  -- p (c \/ a) (c \/ f a)
   t = right' apfa
 
-  -- g :: p s s 
+  -- p s s 
   g = dimap f1 f2 t
 
-  -- f1 :: s -> Either c a
+  -- s -> c \/ a
   f1 s = case get s of 
       Just a -> Right a
       Nothing -> Left s
 
-  -- f2 :: Either s (f a) -> s
+  -- s \/ f a -> f s
   f2 (Left s) = pure s
   f2 (Right fa) = fmap put fa
 
@@ -327,20 +330,70 @@ prism' put get apfa = let
 
 prism :: (b -> t) -> (s -> Either t a) -> Prism s t a b
 prism put get apfb = let 
-  -- t :: p (Either t a) (Either t (f b))
+  -- p (t \/ a) (t \/ f b)
   t = right' apfb
 
+  -- p s t
   g = dimap f1 f2 t
 
-  -- f1 :: s -> Either t a
+  -- s -> t \/ a
   f1 = get
 
-  -- f2 :: Either t (f b) -> (f t)
+  -- t \/ f b -> f t
   f2 = either pure (fmap put)
   in g
+
+reviewPrism :: Prism' s a -> a -> s
+reviewPrism p = runIdentity . unTagged . p . Tagged . Identity
+
+modifyPrism :: Prism' s a -> (a -> a) -> (s -> s)
+modifyPrism p f s = runIdentity $ p (Identity . f) s
+
+
+data Market a b s t = Market (b -> t) (s -> Either t a)
+
+instance Functor (Market a b s) where 
+  fmap f (Market bt sEta) = Market (f . bt) (either (Left . f) Right . sEta)
+
+instance Profunctor (Market a b) where 
+  dimap lf rf (Market bt sEta) = Market (rf . bt) (either (Left . rf) Right . sEta . lf)
+
+instance Choice (Market a b) where 
+  right' :: Market a b s t -> Market a b (x \/ s) (x \/ t)
+  right' (Market bt sEta) = Market (Right . bt) foo 
+    where 
+      foo (Left x) = Left (Left x)
+      foo (Right s) = case sEta s of 
+        Left t -> Left (Right t)
+        Right a -> Right a
+
+unPrism :: forall s t a b . Prism s t a b -> (b -> t, s -> Either t a)
+unPrism p = (bt, sEta) 
+  where 
+    c :: Market a b a (Identity b) -- p a (f b)
+    c = Market Identity Right
+    
+    r :: Market a b s (Identity t) -- p s (f t)
+    r = p c
+
+    Market bFt sEtFa = r
+    bt = runIdentity . bFt
+    sEta = either (Left . runIdentity) Right . sEtFa
+
 
 
 type L p f s t a b = p a (f b) -> p s (f t)
 type Lens_ s t a b = forall f . Functor f => L (->) f s t a b
 type Traversal_ s t a b = forall f . Applicative f => L (->) f s t a b
-type Iso_ s t a b = forall p f . (Profunctor p, Functor f) => L (->) f s t a b
+type Iso_ s t a b = forall p f . (Profunctor p, Functor f) => L p f s t a b
+type Prism_ s t a b = forall p f . (Choice p, Functor f) => L p f s t a b
+
+
+lens2traversal :: Lens_ s t a b -> Traversal_ s t a b
+lens2traversal = id
+
+iso2prism :: Iso_ s t a b -> Prism_ s t a b
+iso2prism = id
+
+prism2Lens :: Prism_ s t a b -> Lens_ s t a b
+prism2Lens = id

@@ -26,6 +26,7 @@ import GHC.TypeLits (Symbol)
 import GHC.OverloadedLabels ( IsLabel(..) )
 import Data.Functor.Const
 import Data.Function ((&))
+import Data.Profunctor
 
 class FieldLens (name :: Symbol) s a | s name -> a where
   fieldLens :: Lens' s a
@@ -160,9 +161,39 @@ tstAct = tstList ^! (each . to show . act putStrLn)
 
 
 
+-- | Test Prisms
+
+data MySumType = A Int | B String | C (Int, String)
+  deriving stock (Show, Eq)
+
+pA :: Prism' MySumType Int
+pA intPFint = dimap fl fr t
+  where 
+    -- intPFint :: Int -> f Int
+
+    -- MySumType \/ f Int -> MySumType \/ (f Int)
+    t = right' intPFint
+
+    -- MySumType -> MySumType \/ Int
+    fl (A n) = Right n
+    fl v     = Left v
+
+    -- MySumType \/ f Int -> f MySumType
+    fr (Left v)  = pure v
+    fr (Right n) = A <$> n
 
 
+tstPrism1 :: MySumType
+tstPrism1 = reviewPrism pA 666
 
+tstPrismMod1 :: MySumType
+tstPrismMod1 = modifyPrism pA (const 666) (A 1)
+
+tstPrismMod2 :: MySumType
+tstPrismMod2 = modifyPrism pA (const 666) (B "qwe")
+
+tstMaybeGetPrism :: Maybe Int
+tstMaybeGetPrism = (A 1) ^? pA
 
 
 
