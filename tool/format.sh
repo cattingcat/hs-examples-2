@@ -1,3 +1,5 @@
+#!/bin/sh
+
 stack install ormolu 
 ormolu --mode inplace $(find . -wholename './*.hs')
 echo "Done!"
