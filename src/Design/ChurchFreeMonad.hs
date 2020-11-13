@@ -1,20 +1,19 @@
-{-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE GADTs #-}
-{-# LANGUAGE KindSignatures #-}
-{-# LANGUAGE StandaloneKindSignatures #-}
 {-# LANGUAGE InstanceSigs #-}
+{-# LANGUAGE KindSignatures #-}
+{-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE StandaloneKindSignatures #-}
 
 module Design.ChurchFreeMonad where
 
 import Data.Kind
 
-
 type Free :: (Type -> Type) -> Type -> Type
 data Free f a = Free (f (Free f a)) | Pure a
 
 type F :: (Type -> Type) -> Type -> Type
-newtype F f a = F { unF :: forall r . (a -> r) -> (f r -> r) -> r }
+newtype F f a = F {unF :: forall r. (a -> r) -> (f r -> r) -> r}
 
 instance Functor (F f) where
   fmap f (F g) = F (\pr fr -> g (pr . f) fr)
@@ -22,8 +21,8 @@ instance Functor (F f) where
 instance Functor f => Applicative (F f) where
   pure a = F (\pr fr -> pr a)
 
-  (<*>) :: forall a b . F f (a -> b) -> F f a -> F f b
---  F f <*> a'@(F a) = F (\pr fr -> f (\fab -> unF (fmap fab a') pr fr ) fr )
+  (<*>) :: forall a b. F f (a -> b) -> F f a -> F f b
+  --  F f <*> a'@(F a) = F (\pr fr -> f (\fab -> unF (fmap fab a') pr fr ) fr )
   F f <*> F g = F (\pr fr -> f (\fab -> g (pr . fab) fr) fr)
 
 instance Functor f => Monad (F f) where
@@ -38,33 +37,25 @@ iterM f (F frf) = frf pure f
 liftF :: Functor f => f a -> F f a
 liftF fa = F (\pr fr -> fr $ fmap pr fa)
 
-
-
-
-
-
-
-
-
 data MyF next where
   A :: (Int, Int) -> (Int -> next) -> MyF next
 
 instance Functor MyF where
   fmap f (A lims nxt) = A lims (f . nxt)
 
-
 type MyFree a = F MyF a
 
 interpretMyFree :: MyFree a -> IO a
-interpretMyFree (F f) = f fa fb where
-  fa :: a -> IO a
-  fa a = pure a
+interpretMyFree (F f) = f fa fb
+  where
+    fa :: a -> IO a
+    fa a = pure a
 
-  fb :: MyF (IO a) -> IO a
-  fb (A (from, to) nxt) = do
-    let r = 4
-    putStrLn $ "random: " ++ show r
-    nxt r
+    fb :: MyF (IO a) -> IO a
+    fb (A (from, to) nxt) = do
+      let r = 4
+      putStrLn $ "random: " ++ show r
+      nxt r
 
 testApp :: MyFree Int
 testApp = do
@@ -73,7 +64,6 @@ testApp = do
   pure (r1 + r2)
 
 runTest = interpretMyFree testApp
-
 
 f :: (Bool -> Bool) -> Char
 f = undefined

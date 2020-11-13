@@ -1,13 +1,14 @@
-{-# LANGUAGE DerivingStrategies #-}
 {-# LANGUAGE DeriveFunctor #-}
+{-# LANGUAGE DerivingStrategies #-}
+{-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE TypeSynonymInstances #-}
-{-# LANGUAGE FlexibleInstances #-}
 
 module Design.RecScheme () where
-import Prelude ()
+
 import Relude
+import Prelude ()
 
 --data List a = Nil | Cons a (List a)
 --  deriving stock (Show)
@@ -25,23 +26,22 @@ sum (ConsF a c) = a + c
 --  with initial object - initial algebra
 
 -- carrier for initial algebra - Fix
-newtype Fix f = In { out :: f (Fix f) }
+newtype Fix f = In {out :: f (Fix f)}
 
 -- So we have arrows from initial object to others
 --  Fix f -> a
 -- catamorphism (from catastrophe)
 
 cata :: Functor f => Algebra f a -> Fix f -> a
-cata alg =  alg . fmap (cata alg). out
-
+cata alg = alg . fmap (cata alg) . out
 
 type List a = Fix (ListF a)
+
 foldr :: (a -> c -> c) -> c -> List a -> c
 foldr f z l = cata foo l
   where
     foo NilF = z
     foo (ConsF a c) = f a c
-
 
 -- Endofunctor category
 -- Objects - Functors
@@ -50,7 +50,8 @@ foldr f z l = cata foo l
 -- Original functor: Functor f => (a -> b) -> (f a -> f b)
 -- Higher functor: Functor f, Functor g => (g ~> f) -> (hf f ~> hf g)
 
-type f :~> g = forall a . f a -> g a
+type f :~> g = forall a. f a -> g a
+
 infixr 0 :~>
 
 class HFunctor hf where
@@ -59,32 +60,31 @@ class HFunctor hf where
 
 type HAlgebra hf f = hf f :~> f
 
-newtype FixH hf a = InH { outH :: hf (FixH hf) a }
+newtype FixH hf a = InH {outH :: hf (FixH hf) a}
 
 hcata :: (HFunctor hf) => HAlgebra hf f -> FixH hf :~> f
 hcata halg = halg . hfmap (hcata halg) . outH
-
-
-
-
 
 class Monad' m where
   eta :: Identity :~> m
   mu :: Compose m m :~> m
 
 data (f :+: g) a = InL (f a) | InR (g a)
+
 type FunctorList f g = Identity :+: Compose f g
+
 -- MonadM is the same as FunctorList
-data MonadM f g a = DoneM a
-                  | MoreM (f (g a))
+data MonadM f g a
+  = DoneM a
+  | MoreM (f (g a))
 
 type FreeMonad f = FixH (MonadM f)
 
 instance Functor (FreeMonad f)
 
-instance Applicative (FreeMonad f) where 
+instance Applicative (FreeMonad f) where
   pure = InH . DoneM
 
 instance Functor f => Monad (FreeMonad f) where
-  (InH (DoneM a))    >>= k = k a
+  (InH (DoneM a)) >>= k = k a
   (InH (MoreM ffra)) >>= k = InH (MoreM (fmap (>>= k) ffra))

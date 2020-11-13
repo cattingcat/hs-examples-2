@@ -1,4 +1,5 @@
 module Tests.TastyTest (main) where
+
 import Test.Tasty
 import Test.Tasty.Hspec
 
@@ -7,7 +8,6 @@ main = do
   specs1 <- testSpecs arithmeticSpec
   specs2 <- testSpecs stringSpec
   defaultMain (testGroup "(no tests)" (specs1 ++ specs2))
-
 
 arithmeticSpec :: Spec
 arithmeticSpec =

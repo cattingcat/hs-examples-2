@@ -1,11 +1,10 @@
-{-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE ConstraintKinds #-}
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
 
 module Extensions.FlexibleContexts () where
 
-import Data.Data (Proxy(..))
-
+import Data.Data (Proxy (..))
 
 class Show a => MyClass a where
   foo :: a -> String

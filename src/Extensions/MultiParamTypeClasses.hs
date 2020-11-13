@@ -5,10 +5,6 @@ module Extensions.MultiParamTypeClasses () where
 class Collection c a where
   union :: c a -> c a -> c a
 
-
-
-
-
 class RiemannHypothesis where
   assumeRH :: a -> a
 

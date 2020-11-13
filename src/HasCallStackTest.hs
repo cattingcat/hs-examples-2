@@ -1,10 +1,10 @@
+{-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE InstanceSigs #-}
 {-# LANGUAGE TypeSynonymInstances #-}
-{-# LANGUAGE FlexibleInstances #-}
 
 module HasCallStackTest () where
 
-import GHC.Stack.Types(HasCallStack)
+import GHC.Stack.Types (HasCallStack)
 
 lol :: HasCallStack => Int
 lol = error "sdfsd"
@@ -12,13 +12,12 @@ lol = error "sdfsd"
 foo :: HasCallStack => String
 foo = "asd" <> "" <> show lol
 
-class MyClass a where 
+class MyClass a where
   bar :: a -> String
-  
-instance MyClass Int where 
+
+instance MyClass Int where
   bar :: HasCallStack => Int -> String
   bar = undefined
-  
-instance MyClass String where 
+
+instance MyClass String where
   bar s = foo
-  

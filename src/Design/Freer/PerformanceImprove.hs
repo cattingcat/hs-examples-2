@@ -1,46 +1,47 @@
-{-# LANGUAGE GADTs #-}
 {-# LANGUAGE DataKinds #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE GADTs #-}
 {-# LANGUAGE KindSignatures #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE PolyKinds #-}
 {-# LANGUAGE RoleAnnotations #-}
 {-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE PolyKinds #-}
-{-# LANGUAGE TypeFamilies #-}
-{-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE UndecidableInstances #-}
 
 module Design.Freer.PerformanceImprove () where
-import Data.Kind
-import Data.Proxy
-import Data.Coerce
+
+import Control.Applicative (Const)
 import Control.Monad ((>=>))
+import Data.Coerce
+import Data.Functor.Identity (Identity)
+import Data.Kind
+import Data.Monoid (Sum (..))
+import Data.Proxy
+import GHC.Natural (naturalToWord)
 import GHC.TypeNats
 import Unsafe.Coerce (unsafeCoerce)
-import GHC.Natural (naturalToWord)
-import Data.Functor.Identity (Identity)
-import Control.Applicative (Const)
-import Data.Monoid (Sum(..))
-
 
 type family Has (a :: k) (as :: [k]) :: Bool where
-  Has a (a ': _)  = 'True
-  Has _ '[]       = 'False
+  Has a (a ': _) = 'True
+  Has _ '[] = 'False
   Has a (_ ': as) = Has a as
 
 type family NonEmpty (as :: [k]) :: Bool where
   NonEmpty '[] = 'False
-  NonEmpty _   = 'True
+  NonEmpty _ = 'True
 
 type family IdxOf (a :: k) (as :: [k]) :: Nat where
   IdxOf a (a ': _) = 0
   IdxOf a (_ ': as) = 1 + IdxOf a as
 
-data Any = forall a . MkAny a
+data Any = forall a. MkAny a
 
 type role Union phantom nominal
+
 data Union (r :: [Type -> Type]) x = MkUnion !Word Any
 
 class Member t r where
@@ -51,25 +52,24 @@ instance (Has r rs ~ 'True, IdxOf r rs ~ n, KnownNat n) => Member r rs where
   inj v = MkUnion (naturalToWord $ natVal $ Proxy @n) (MkAny v)
   prj (MkUnion indx (MkAny v)) =
     if indx == naturalToWord (natVal $ Proxy @n)
-    then Just (unsafeCoerce v)
-    else Nothing
+      then Just (unsafeCoerce v)
+      else Nothing
 
-decomp :: forall r rs x . Union (r ': rs) x -> Either (Union rs x) (r x)
-decomp u@(MkUnion n a) = let res :: Maybe (r x) = prj u
-  in case res of
-    Nothing -> Left $ MkUnion (n - 1) a
-    Just r -> Right r
+decomp :: forall r rs x. Union (r ': rs) x -> Either (Union rs x) (r x)
+decomp u@(MkUnion n a) =
+  let res :: Maybe (r x) = prj u
+   in case res of
+        Nothing -> Left $ MkUnion (n - 1) a
+        Just r -> Right r
 
 tstUnion :: Union [Identity, Const Int, (,) String] Int
 tstUnion = inj ("", 55)
-
-
 
 data ArrQueue (m :: Type -> Type) a b where
   ASing :: (a -> m b) -> ArrQueue m a b
   AComp :: (a -> m b) -> ArrQueue m b c -> ArrQueue m a c
 
-(|>) ::  ArrQueue m a x -> (x -> m b) -> ArrQueue m a b
+(|>) :: ArrQueue m a x -> (x -> m b) -> ArrQueue m a b
 (|>) (ASing f) g = AComp f (ASing g)
 (|>) (AComp f fc) g = AComp f (fc |> g)
 
@@ -80,12 +80,12 @@ tsingleton = ASing
 (|><|) (ASing f) g = AComp f g
 (|><|) (AComp f fc) g = AComp f (fc |><| g)
 
-
 type Arr r a b = a -> Eff r b
+
 type Arrs (r :: [Type -> Type]) a b = ArrQueue (Eff r) a b
 
 data Eff (r :: [Type -> Type]) a where
-  Pure   :: a   -> Eff r a
+  Pure :: a -> Eff r a
   Impure :: Union r x -> Arrs r x a -> Eff r a
 
 instance Functor (Eff r) where
@@ -103,9 +103,6 @@ instance Monad (Eff r) where
   (Pure a) >>= f = f a
   (Impure a g) >>= f = Impure a (g |> f)
 
-
-
-
 signleK :: Arr r a b -> Arrs r a b
 signleK = tsingleton
 
@@ -116,8 +113,6 @@ qApp (AComp f fc) a = foo (f a) fc
     foo :: Eff r a -> Arrs r a b -> Eff r b
     foo (Pure pa) arr = qApp arr pa
     foo (Impure uni iarr) arr = Impure uni (iarr |><| arr)
-
-
 
 data Reader s a where
   Get :: Reader s s
@@ -149,27 +144,25 @@ runEff (Impure _ _) = error "impossible"
 qComp :: Arrs r a b -> (Eff r b -> Eff r' c) -> Arrs r' a c
 qComp g h = tsingleton $ h . qApp g
 
-
 tst :: Int
 tst = runEff $ runReader 55 tstM
   where
     tstM :: Eff '[Reader Int] Int
     tstM = addGet 5
 
-
 data Writer w a where
   Put :: w -> Writer w ()
 
-runWriter :: forall w r a . Monoid w => Eff (Writer w ': r) a -> Eff r (w, a)
+runWriter :: forall w r a. Monoid w => Eff (Writer w ': r) a -> Eff r (w, a)
 runWriter = loop
   where
     loop :: Eff (Writer w ': r) a -> Eff r (w, a)
     loop (Pure a) = pure (mempty, a)
     loop (Impure u q) = case decomp u of
-      Right (Put w) -> let
-        cont = qApp q ()
-        r = loop cont
-        in fmap (\(w', a) -> (w <> w', a)) r
+      Right (Put w) ->
+        let cont = qApp q ()
+            r = loop cont
+         in fmap (\(w', a) -> (w <> w', a)) r
       Left o -> Impure o (qComp q loop)
 
 put :: Member (Writer w) r => w -> Eff r ()
@@ -179,8 +172,7 @@ rwApp :: Eff [Reader Int, Writer (Sum Int)] Int
 rwApp = do
   i :: Int <- ask
   put (Sum i <> Sum i)
-  _::Int <- if i > 0 then ask else pure 66
+  _ :: Int <- if i > 0 then ask else pure 66
   ask
-
 
 tstRwApp = runEff $ runWriter (runReader 999 rwApp)

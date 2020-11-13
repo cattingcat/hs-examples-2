@@ -1,5 +1,5 @@
-{-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE FunctionalDependencies #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
 
 module Extensions.FunctionalDependencies () where
 
@@ -8,15 +8,13 @@ module Extensions.FunctionalDependencies () where
 --  insert1 :: s -> a -> s
 
 class Coll s a | s -> a where
-  empty  :: s
+  empty :: s
   insert :: s -> a -> s
 
-
-
 class Collects e ce where
---    empty  :: ce
-    insert2 :: e -> ce -> ce
-    member2 :: e -> ce -> Bool
+  --    empty  :: ce
+  insert2 :: e -> ce -> ce
+  member2 :: e -> ce -> Bool
 
 -- Problem: check f type via GHCi with and without "| ce -> e"
 f a b = insert2 a . insert2 b

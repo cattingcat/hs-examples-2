@@ -1,8 +1,8 @@
-{-# LANGUAGE GADTs #-}
 {-# LANGUAGE DerivingStrategies #-}
+{-# LANGUAGE GADTs #-}
+{-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeOperators #-}
-{-# LANGUAGE RankNTypes #-}
 
 module Design.FM () where
 
@@ -10,7 +10,7 @@ module Design.FM () where
 -- http://okmij.org/ftp/Computation/free-monad.html
 
 data LogLevel = Info | Warn | Err
-  deriving stock Show
+  deriving stock (Show)
 
 type Message = String
 
@@ -25,8 +25,6 @@ interpretLogger (Log lvl msg nxt) = do
   putStrLn $ show lvl ++ ": " ++ msg
   pure $ nxt ()
 
-
-
 data RandomF next where
   Rand :: (Int, Int) -> (Int -> next) -> RandomF next
 
@@ -37,26 +35,23 @@ interpretRandom :: RandomF a -> IO a
 interpretRandom (Rand (from, to) nxt) = do
   pure $ nxt 4
 
-
-
 data ReadLineF next where
   Readl :: (String -> next) -> ReadLineF next
 
 instance Functor ReadLineF where
   fmap f (Readl nxt) = Readl (f . nxt)
 
-interpretReadLine :: ReadLineF a -> IO a 
+interpretReadLine :: ReadLineF a -> IO a
 interpretReadLine (Readl nxt) = do
   line <- getLine
   pure $ nxt line
-  
-type f ~> g = forall a . f a -> g a
 
-interpretReadLine' :: ReadLineF ~> IO 
+type f ~> g = forall a. f a -> g a
+
+interpretReadLine' :: ReadLineF ~> IO
 interpretReadLine' (Readl nxt) = do
   line <- getLine
   pure $ nxt line
-
 
 data Free f a = Free (f (Free f a)) | Pure a
 
@@ -66,8 +61,8 @@ instance (Functor f) => Functor (Free f) where
 
 instance (Functor f) => Applicative (Free f) where
   pure = Pure
-  Pure f <*> fa  = fmap f fa
-  f <*> Pure fa  = fmap ($ fa) f
+  Pure f <*> fa = fmap f fa
+  f <*> Pure fa = fmap ($ fa) f
   Free f <*> v = Free $ fmap (<*> v) f
 
 instance (Functor f) => Monad (Free f) where
@@ -83,27 +78,23 @@ foldFree u (Free f) = do
 liftF :: (Functor f) => f a -> Free f a
 liftF fa = Free $ fmap Pure fa
 
-
-
-
-
-
 type Logger a = Free LoggerF a
+
 evalLogger :: Logger a -> IO a
 --evalLogger (MkFree l) = do
 --  res <- interpretLogger l
 --  evalLogger res
 evalLogger = foldFree interpretLogger
 
-
 type Random a = Free RandomF a
+
 evalRandom :: Random a -> IO a
 evalRandom = foldFree interpretRandom
 
 type ReadLine a = Free ReadLineF a
+
 evalReadLine :: ReadLine a -> IO a
 evalReadLine = foldFree interpretReadLine
-
 
 data AppF a where
   AppLog :: Logger () -> (() -> a) -> AppF a
@@ -131,7 +122,6 @@ type App a = Free AppF a
 evalApp :: App a -> IO a
 evalApp = foldFree interpretApp
 
-
 log'' :: String -> Logger ()
 log'' s = Free (Log Info s (\_ -> Pure ()))
 
@@ -147,12 +137,11 @@ rnd = liftF $ AppRnd (liftF $ Rand (1, 1000) id) id
 readl :: App String
 readl = liftF $ AppReadLn (liftF $ Readl id) id
 
-
 simpleApp :: IO ()
 simpleApp = evalApp fmApp
   where
     fmApp :: App ()
     fmApp = do
       l <- readl
-      n <- fmap (+10) rnd
+      n <- fmap (+ 10) rnd
       logB $ show n ++ " " ++ l

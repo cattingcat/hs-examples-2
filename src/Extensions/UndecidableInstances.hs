@@ -1,13 +1,13 @@
+{-# LANGUAGE AllowAmbiguousTypes #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE UndecidableInstances #-}
-{-# LANGUAGE AllowAmbiguousTypes #-}
 
 module Extensions.UndecidableInstances () where
 
-class D c where {}
-class Conv a b where {}
+class D c
 
--- loop 
-instance (Conv a b, D b) => D a where {}
+class Conv a b
 
+-- loop
+instance (Conv a b, D b) => D a

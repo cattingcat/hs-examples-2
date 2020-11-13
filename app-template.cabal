@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 233f58d68fd2188e76f7af2af84a365e59ae1e89562c96bd3eb0349eb5dbfa68
+-- hash: a4d0391cb24c6f8ccc7717b3111552cc3bbc5a59d4c1a6fbdb53084b029984fc
 
 name:           app-template
 version:        0.1.0.0
@@ -110,6 +110,7 @@ library
       Lenses.Lens
       Lenses.Lenses
       Lenses.OneMoreAttempt.Lens
+      Lenses.OneMoreAttempt.ProfunctorStuff
       Lenses.OneMoreAttempt.Test
       Lib
       SOP.TestSOP
@@ -121,6 +122,7 @@ library
       Paths_app_template
   hs-source-dirs:
       src
+  default-extensions: InstanceSigs DefaultSignatures
   ghc-options: -Weverything -Wcompat -Wno-safe -Wno-unused-top-binds -Wno-missing-import-lists -Wno-missing-safe-haskell-mode -Wno-implicit-prelude -Wno-unsafe -Wno-unused-packages -funbox-strict-fields
   build-depends:
       algebraic-graphs
@@ -155,6 +157,7 @@ executable app-template-exe
       Paths_app_template
   hs-source-dirs:
       app
+  default-extensions: InstanceSigs DefaultSignatures
   ghc-options: -threaded -rtsopts -with-rtsopts=-N -Wall
   build-depends:
       algebraic-graphs
@@ -190,6 +193,7 @@ executable simulation
       Paths_app_template
   hs-source-dirs:
       simulations
+  default-extensions: InstanceSigs DefaultSignatures
   ghc-options: -threaded -rtsopts -with-rtsopts=-N -Wall
   build-depends:
       algebraic-graphs
@@ -228,6 +232,7 @@ test-suite app-template-test
       Paths_app_template
   hs-source-dirs:
       test
+  default-extensions: InstanceSigs DefaultSignatures
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       algebraic-graphs
@@ -267,6 +272,7 @@ benchmark app-template-bench
       Paths_app_template
   hs-source-dirs:
       benchmarks
+  default-extensions: InstanceSigs DefaultSignatures
   build-depends:
       algebraic-graphs
     , app-template

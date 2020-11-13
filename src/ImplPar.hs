@@ -1,18 +1,16 @@
 {-# LANGUAGE DataKinds #-}
-{-# LANGUAGE TypeSynonymInstances #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE TypeSynonymInstances #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
 
 module ImplPar where
 
-import GHC.Classes
 import Data.Data
-
-
+import GHC.Classes
 
 instance IP "kek" String where
   ip = "puk"
@@ -20,10 +18,9 @@ instance IP "kek" String where
 instance IP "foo" String where
   ip = "bar"
 
-
-
-foo :: forall sym . IP sym String => Proxy sym -> String
+foo :: forall sym. IP sym String => Proxy sym -> String
 foo _ = ip @sym @_
 
 tst1 = foo (Proxy @"kek")
+
 tst2 = foo (Proxy @"foo")

@@ -1,16 +1,13 @@
-{-# LANGUAGE GADTs #-}
+{-# LANGUAGE AllowAmbiguousTypes #-}
 {-# LANGUAGE DataKinds #-}
+{-# LANGUAGE GADTs #-}
 {-# LANGUAGE PolyKinds #-}
 {-# LANGUAGE RankNTypes #-}
-{-# LANGUAGE AllowAmbiguousTypes #-}
 {-# LANGUAGE RebindableSyntax #-}
 
 module IxMon () where
 
-import Prelude hiding ((>>=), (>>))
-
-
-
+import Prelude hiding ((>>), (>>=))
 
 data FileStatus = Opened | Closed
 
@@ -41,7 +38,6 @@ instance IxMonad Fs where
 (>>) :: Fs i j a -> Fs j k b -> Fs i k b
 (>>) a b = a `ibind` const b
 
-
 open' :: String -> Fs 'Closed 'Opened ()
 open' = undefined
 
@@ -62,5 +58,5 @@ tstprog = do
   open' ""
   s <- read'
   close'
---  s2 <- read'
+  --  s2 <- read'
   ipure s

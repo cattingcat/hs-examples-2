@@ -1,18 +1,17 @@
-{-# LANGUAGE TypeSynonymInstances #-}
 {-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE TypeSynonymInstances #-}
 
-module Design.TF.FirstOrderLang (
-  ExpSym(..),
-  tst4
-) where
+module Design.TF.FirstOrderLang
+  ( ExpSym (..),
+    tst4,
+  )
+where
 
 import Data.Monoid
 
-
-
 -- | Initial embedding (via ADT)
-data Exp =
-    Lit Int
+data Exp
+  = Lit Int
   | Neg Exp
   | Add Exp Exp
 
@@ -22,7 +21,6 @@ eval :: Exp -> Int
 eval (Lit a) = a
 eval (Neg e) = - eval e
 eval (Add l r) = eval l + eval r
-
 
 -- | Representation type
 type Repr = Int
@@ -45,7 +43,6 @@ view (Neg e) = "-" ++ view e
 view (Add l r) = "(" ++ view l ++ " + " ++ view r ++ ")"
 
 tst3 = view tst1
-
 
 -- | Final embedding allows multiple interpretations
 class ExpSym repr where
@@ -74,6 +71,6 @@ instance ExpSym Exp where
 sumExp :: ExpSym repr => [repr] -> repr
 sumExp l = appEndo (foldMap (Endo . add) l) (lit 0)
 
-tst5 = (sumExp [tst4, tst4]) ::Int
-tst6 = (sumExp [tst4, tst4]) ::String
+tst5 = (sumExp [tst4, tst4]) :: Int
 
+tst6 = (sumExp [tst4, tst4]) :: String

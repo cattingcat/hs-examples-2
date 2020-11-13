@@ -1,10 +1,9 @@
-{-# OPTIONS_GHC -Wno-all -Wno-Weverything -Wno-compat -Wno-missing-local-signatures #-}
-{-# LANGUAGE NoMonomorphismRestriction #-}
 {-# LANGUAGE DerivingStrategies #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE NoMonomorphismRestriction #-}
+{-# OPTIONS_GHC -Wno-all -Wno-Weverything -Wno-compat -Wno-missing-local-signatures #-}
 
 module Design.TF.HigherOrderLang2 () where
-
 
 class Symantics repr where
   int :: Int -> repr Int
@@ -13,18 +12,14 @@ class Symantics repr where
   lam :: (repr a -> repr b) -> repr (a -> b)
   app :: repr (a -> b) -> repr a -> repr b
 
-
 tst1 = add (int 1) (int 2)
 
 tst2 = lam (\x -> add x x)
 
-tst3 = lam (\x -> add (app x (int 1))  (int 2) )
-
-
-
+tst3 = lam (\x -> add (app x (int 1)) (int 2))
 
 newtype R a = R a
-  deriving newtype Show
+  deriving newtype (Show)
 
 instance Symantics R where
   int = R
@@ -36,9 +31,9 @@ instance Symantics R where
 evalR :: R a -> a
 evalR (R a) = a
 
-
 type VarCounter = Int
-newtype S a = S { unS :: VarCounter -> String }
+
+newtype S a = S {unS :: VarCounter -> String}
 
 instance Symantics S where
   int n = S $ const (show n)
@@ -46,7 +41,7 @@ instance Symantics S where
 
   lam f = S $ \count ->
     let x = "x" ++ show count
-    in  "(\\" ++ x ++ " -> " ++ unS (f (S $ const x)) (succ count) ++ ")"
+     in "(\\" ++ x ++ " -> " ++ unS (f (S $ const x)) (succ count) ++ ")"
   app (S f) (S a) = S $ \count -> "(" ++ f count ++ " " ++ a count ++ ")"
 
 evalS :: S a -> String

@@ -1,29 +1,26 @@
-{-# LANGUAGE TypeFamilies #-}
-{-# LANGUAGE RankNTypes #-}
-{-# LANGUAGE TypeApplications #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE UnicodeSyntax #-}
-{-# LANGUAGE MagicHash #-}
-{-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE TypeSynonymInstances #-}
-{-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE BangPatterns #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE MagicHash #-}
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE TypeSynonymInstances #-}
+{-# LANGUAGE UnicodeSyntax #-}
 
 module HsSyntax.AssociatedTypes () where
 
-import Data.Data (Proxy(..))
-import GHC.Base (Word(..), Int(..), word2Int#, int2Word#, compareWord#)
-
+import Data.Data (Proxy (..))
+import GHC.Base (Int (..), Word (..), compareWord#, int2Word#, word2Int#)
 
 class (Num (RetType a)) => MyClass a where
   type RetType a
   foo :: a -> RetType a
   showRet :: Proxy a -> RetType a -> String
 
-
-bar :: ∀ a . MyClass a => a -> String
+bar :: forall a. MyClass a => a -> String
 bar a = showRet (Proxy @a) $ foo a
-
 
 instance MyClass Int where
   type RetType Int = Int
@@ -40,13 +37,14 @@ instance MyClass Word where
 --  foo = undefined
 --  showRet = undefined
 
-tst1 = bar (-55 ::Int)
-tst2 = bar (18446700000000000000 ::Word)
+tst1 = bar (-55 :: Int)
+
+tst2 = bar (18446700000000000000 :: Word)
 
 w2i :: Word -> Maybe Int
-w2i (W# w) = let 
-  !(I# m) = (maxBound :: Int) 
-  !less = compareWord# w (int2Word# m) == LT in 
-    if less  
-    then Just $ I# (word2Int# w) 
-    else Nothing
+w2i (W# w) =
+  let !(I# m) = (maxBound :: Int)
+      !less = compareWord# w (int2Word# m) == LT
+   in if less
+        then Just $ I# (word2Int# w)
+        else Nothing

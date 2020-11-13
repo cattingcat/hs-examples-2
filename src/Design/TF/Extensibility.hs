@@ -1,20 +1,20 @@
-{-# LANGUAGE TypeSynonymInstances #-}
 {-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE TypeSynonymInstances #-}
 
-module Design.TF.Extensibility (
-  MulSym(..),
-) where
+module Design.TF.Extensibility
+  ( MulSym (..),
+  )
+where
 
 import Design.TF.FirstOrderLang
 
 -- | Initial embedding (via ADT)
 -- We have to add new expression via modivifation
-data Exp =
-    Lit Int
+data Exp
+  = Lit Int
   | Neg Exp
   | Add Exp Exp
   | Mul Exp Exp
-
 
 -- | Final embedding
 -- Allows to extend separately
@@ -32,5 +32,3 @@ instance MulSym Int where
 
 instance MulSym String where
   mul l r = "(" ++ l ++ " * " ++ r ++ "+"
-
-

@@ -1,28 +1,25 @@
 {-# LANGUAGE AllowAmbiguousTypes #-}
-{-# LANGUAGE DerivingStrategies #-}
-{-# LANGUAGE DeriveGeneric #-}
-{-# LANGUAGE TypeOperators #-}
-{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE DefaultSignatures #-}
 {-# LANGUAGE DeriveAnyClass #-}
-{-# LANGUAGE StandaloneDeriving #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DerivingStrategies #-}
+{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE StandaloneDeriving #-}
+{-# LANGUAGE TypeOperators #-}
 
 module Extensions.DefaultSignatures () where
 
 import GHC.Generics
 
-
 class StructureDepth a where
   inspect :: a -> Int
-
   default inspect :: (Generic a, Depth (Rep a)) => a -> Int
   inspect a = depth (from a)
 
 data MySum = A MySum MySum | B | C
   deriving stock (Show, Generic)
-  deriving anyclass StructureDepth
-
+  deriving anyclass (StructureDepth)
 
 class Depth a where
   depth :: a x -> Int
@@ -48,5 +45,7 @@ instance Depth U1 where
 --  let a = from (undefined :: MySum)
 
 tst1 = inspect (A B (A B (A B C)))
+
 tst2 = inspect B
+
 tst3 = inspect C

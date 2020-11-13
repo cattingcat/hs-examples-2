@@ -1,20 +1,20 @@
-{-# LANGUAGE DerivingStrategies #-}
-{-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE AllowAmbiguousTypes #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE TypeApplications #-}
-{-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE DataKinds #-}
+{-# LANGUAGE DerivingStrategies #-}
 {-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE KindSignatures #-}
 {-# LANGUAGE QuantifiedConstraints #-}
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE UndecidableInstances #-}
 
 module Design.TF.Serialization () where
 
-import Design.TF.FirstOrderLang
 import Design.TF.Extensibility
+import Design.TF.FirstOrderLang
 import Extensions.DataKinds
 
 fix :: (a -> a) -> a
@@ -36,7 +36,7 @@ type ErrMsg = String
 safeRead :: Read t => String -> Either ErrMsg t
 safeRead s = case reads s of
   [(x, "")] -> Right x
-  _         -> Left $ "Read error: " ++ s
+  _ -> Left $ "Read error: " ++ s
 
 fromTree :: ExpSym repr => Tree -> Either ErrMsg repr
 fromTree (Node "Lit" [Leaf s]) = lit <$> safeRead s
@@ -57,13 +57,13 @@ view = id
 tst3 :: IO ()
 tst3 = case fromTree tst1 of
   Left err -> putStrLn err
-  Right r  -> do
+  Right r -> do
     print $ view r
+
 --    print $ eval r -- It doesn't work because after @view@ call type deducted to String
 
-
 -- | Attempt I: forall wrapper
-newtype Wrapped = Wrapped (forall repr . ExpSym repr => repr)
+newtype Wrapped = Wrapped (forall repr. ExpSym repr => repr)
 
 fromTreeWrapped :: Tree -> Either ErrMsg Wrapped
 fromTreeWrapped _ = undefined -- Wrapped <$> (fromTree @r t)
@@ -71,10 +71,9 @@ fromTreeWrapped _ = undefined -- Wrapped <$> (fromTree @r t)
 tst4 :: IO ()
 tst4 = case fromTreeWrapped tst1 of
   Left err -> putStrLn err
-  Right (Wrapped r)  -> do
+  Right (Wrapped r) -> do
     print $ view r
-    print $ eval r  -- Works with wrapped
-
+    print $ eval r -- Works with wrapped
 
 -- | Attempt II: Tuple
 newtype DoubleExp a b = DoubleExp (a, b)
@@ -87,7 +86,7 @@ instance (ExpSym repr, ExpSym repr') => ExpSym (DoubleExp repr repr') where
 tst5 :: IO ()
 tst5 = case fromTree tst1 of
   Left err -> putStrLn err
-  Right (DoubleExp (r1, r2))  -> do
+  Right (DoubleExp (r1, r2)) -> do
     print $ view r1
     print $ eval r2
 
@@ -106,27 +105,25 @@ instance ExpSym (ExpHList '[]) where
 --  add (ExpHList(HCons le _))  (ExpHList (HCons re _)) = ExpHList $ HCons (add le re) HNil
 
 instance (ExpSym t, ExpSym (ExpHList ts)) => ExpSym (ExpHList (t ': ts)) where
-  lit n = let
-    (ExpHList t) = lit n
-      in ExpHList $ HCons (lit n) t
-  neg (ExpHList (HCons e t)) = let
-    (ExpHList tl) = neg (ExpHList t)
-      in ExpHList $ HCons (neg e) tl
-  add (ExpHList (HCons le lt)) (ExpHList (HCons re rt)) = let
-    (ExpHList tl) = add (ExpHList lt) (ExpHList rt)
-      in ExpHList $ HCons (add le re) tl
+  lit n =
+    let (ExpHList t) = lit n
+     in ExpHList $ HCons (lit n) t
+  neg (ExpHList (HCons e t)) =
+    let (ExpHList tl) = neg (ExpHList t)
+     in ExpHList $ HCons (neg e) tl
+  add (ExpHList (HCons le lt)) (ExpHList (HCons re rt)) =
+    let (ExpHList tl) = add (ExpHList lt) (ExpHList rt)
+     in ExpHList $ HCons (add le re) tl
 
 tst6 :: IO ()
 tst6 = case fromTree @(ExpHList [String, Int, Tree]) tst1 of
   Left err -> putStrLn err
-  Right (ExpHList (HCons r1 (HCons r2 (HCons r3 HNil))))  -> do
+  Right (ExpHList (HCons r1 (HCons r2 (HCons r3 HNil)))) -> do
     print $ view r1
     print $ eval r2
-    print   r3
-
+    print r3
 
 -- | Extension
-
 instance MulSym Tree where
   mul l r = Node "Mul" [l, r]
 
@@ -137,29 +134,26 @@ instance (MulSym repr, MulSym repr') => MulSym (DoubleExp repr repr') where
 --fromTreeExt' (Node "Mul" [l, r]) =  mul <$> fromTreeExt' l <*> fromTreeExt' r
 --fromTreeExt' n = fromTree n -- Not correct, from tree will not parse "Mul" nodes
 
-
 fromTreeExtFix' :: (ExpSym repr, MulSym repr) => (Tree -> Either ErrMsg repr) -> Tree -> Either ErrMsg repr
-fromTreeExtFix' self (Node "Mul" [l, r])   = mul <$> self l <*> self r
-fromTreeExtFix' _    (Node "Lit" [Leaf s]) = lit <$> safeRead s
-fromTreeExtFix' self (Node "Neg" [e])      = neg <$> self e
-fromTreeExtFix' self (Node "Add" [l, r])   = add <$> self l <*> self r
-fromTreeExtFix' _    n                     = Left $ "Unknown node: " ++ show n
+fromTreeExtFix' self (Node "Mul" [l, r]) = mul <$> self l <*> self r
+fromTreeExtFix' _ (Node "Lit" [Leaf s]) = lit <$> safeRead s
+fromTreeExtFix' self (Node "Neg" [e]) = neg <$> self e
+fromTreeExtFix' self (Node "Add" [l, r]) = add <$> self l <*> self r
+fromTreeExtFix' _ n = Left $ "Unknown node: " ++ show n
 
 fromTreeExt' :: (ExpSym repr, MulSym repr) => Tree -> Either ErrMsg repr
 fromTreeExt' = fix fromTreeExtFix'
-
-
 
 -- | Truly extensible parser
 
 -- Old parser
 fromTreeFix1' :: (ExpSym repr) => (Tree -> Either ErrMsg repr) -> Tree -> Either ErrMsg repr
-fromTreeFix1' _    (Node "Lit" [Leaf s]) = lit <$> safeRead s
-fromTreeFix1' self (Node "Neg" [e])      = neg <$> self e
-fromTreeFix1' self (Node "Add" [l, r])   = add <$> self l <*> self r
-fromTreeFix1' _    n                     = Left $ "Unknown node: " ++ show n
+fromTreeFix1' _ (Node "Lit" [Leaf s]) = lit <$> safeRead s
+fromTreeFix1' self (Node "Neg" [e]) = neg <$> self e
+fromTreeFix1' self (Node "Add" [l, r]) = add <$> self l <*> self r
+fromTreeFix1' _ n = Left $ "Unknown node: " ++ show n
 
 -- Parser with Mul calls old one, but pass callback for new one
 fromTreeFix2' :: (ExpSym repr, MulSym repr) => (Tree -> Either ErrMsg repr) -> Tree -> Either ErrMsg repr
-fromTreeFix2' self (Node "Mul" [l, r])   = mul <$> self l <*> self r
-fromTreeFix2' self n                     = fromTreeFix1' self n
+fromTreeFix2' self (Node "Mul" [l, r]) = mul <$> self l <*> self r
+fromTreeFix2' self n = fromTreeFix1' self n

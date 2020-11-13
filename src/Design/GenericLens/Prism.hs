@@ -1,30 +1,28 @@
-{-# LANGUAGE DerivingStrategies #-}
+{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DerivingStrategies #-}
 {-# LANGUAGE OverloadedLabels #-}
 {-# LANGUAGE TypeApplications #-}
-{-# LANGUAGE DataKinds #-}
 
 module Design.GenericLens.Prism where
 
-import GHC.Generics
-import Data.Generics.Sum
-import Data.Generics.Labels
-import Data.Function ((&))
 import Control.Lens
-
+import Data.Function ((&))
+import Data.Generics.Labels
+import Data.Generics.Sum
+import GHC.Generics
 
 data MyData
   = MyA String
   | MyB Int Int
-    deriving stock (Generic, Show)
-
+  deriving stock (Generic, Show)
 
 testData = [MyA "1", MyA "2", MyB 1 1, MyB 2 2]
 
 foo :: [MyData] -> [String]
 foo as = as ^.. each . #_MyA
 
-bar :: Maybe String 
+bar :: Maybe String
 bar = (MyA "1") ^? (_Ctor @"MyA")
 
 bar' :: Maybe (Int, Int)

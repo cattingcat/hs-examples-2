@@ -1,17 +1,17 @@
+{-# LANGUAGE DerivingStrategies #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE UndecidableInstances #-}
-{-# LANGUAGE DerivingStrategies #-}
 
 module HsSyntax.FixAndRec where
+
 import Prelude hiding (succ)
 
 fix :: (a -> a) -> a
 fix f = f (fix f)
 
 factor :: Int -> Int
-factor = fix (\ f n -> if n > 1 then n * f (n - 1) else n)
-
+factor = fix (\f n -> if n > 1 then n * f (n - 1) else n)
 
 newtype Fix f = MkFix (f (Fix f))
 
@@ -19,7 +19,7 @@ instance Show (f (Fix f)) => Show (Fix f) where
   show (MkFix f) = "Fix " ++ show f
 
 data FNat a = Zero | Succ a
-  deriving stock Show
+  deriving stock (Show)
 
 type Nat = Fix FNat
 
@@ -41,7 +41,6 @@ fold f (MkFix a) = f (fmap (fold f) a)
 
 unfold :: Functor f => (b -> f b) -> b -> Fix f
 unfold f b = MkFix $ fmap (unfold f) (f b)
-
 
 class (Functor f, Functor g) => NatTranstorm f g where
   transform :: f a -> g a

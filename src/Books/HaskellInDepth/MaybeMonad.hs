@@ -1,10 +1,10 @@
-{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE InstanceSigs #-}
+{-# LANGUAGE LambdaCase #-}
 
 module Books.HaskellInDepth.MaybeMonad () where
 
-import Prelude ()
 import Relude hiding (MaybeT, runMaybeT)
+import Prelude ()
 
 newtype MaybeT m a = MaybeT {runMaybeT :: m (Maybe a)}
 
@@ -16,7 +16,7 @@ instance Applicative m => Applicative (MaybeT m) where
   MaybeT f <*> MaybeT a = MaybeT $ (<*>) <$> f <*> a
 
 instance Monad m => Monad (MaybeT m) where
-  (>>=) (MaybeT ma) fb = MaybeT $ ma >>= (\case {Just a -> runMaybeT (fb a); _ -> pure Nothing})
+  (>>=) (MaybeT ma) fb = MaybeT $ ma >>= (\case Just a -> runMaybeT (fb a); _ -> pure Nothing)
 
 instance Applicative m => Alternative (MaybeT m) where
   empty :: MaybeT m a

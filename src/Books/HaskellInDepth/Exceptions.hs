@@ -2,14 +2,13 @@
 
 module Books.HaskellInDepth.Exceptions () where
 
-import Prelude ()
-
 import Control.Exception.Safe
 import Relude
+import Prelude ()
 
-
-data MyArithException = DivByZero
-                      | OtherArithExcept
+data MyArithException
+  = DivByZero
+  | OtherArithExcept
   deriving stock (Show)
 
 instance Exception MyArithException
@@ -19,8 +18,8 @@ divSafe _ 0 = throwM DivByZero
 divSafe a b = pure (a `div` b)
 
 tstDiv a b c = divSafe a b >>= divSafe c
---  (tstDiv 22 0 30) :: Maybe Int
 
+--  (tstDiv 22 0 30) :: Maybe Int
 
 divTestIO :: Int -> Int -> Int -> IO Int
 divTestIO a b c = handle handler (tstDiv a b c)
@@ -30,9 +29,9 @@ divTestIO a b c = handle handler (tstDiv a b c)
       print e
       pure 88
 
-
 data Level = Info | Warn | Error
-newtype LoggingT m a = LoggingT {runLoggingT :: (Level -> String -> IO ()) -> m a }
+
+newtype LoggingT m a = LoggingT {runLoggingT :: (Level -> String -> IO ()) -> m a}
 
 class MonadLogging m where
   log :: Level -> String -> m ()

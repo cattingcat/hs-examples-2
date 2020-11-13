@@ -1,7 +1,8 @@
 module Main (main) where
+
+import System.Directory
 import qualified Tests.DocTest as DocTest
 import qualified Tests.TastyTest as TastyTest
-import System.Directory
 
 main :: IO ()
 main = do

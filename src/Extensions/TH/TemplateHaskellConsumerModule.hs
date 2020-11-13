@@ -1,15 +1,15 @@
-{-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE QuasiQuotes #-}
+{-# LANGUAGE TemplateHaskell #-}
 
-module Extensions.TH.TemplateHaskellConsumerModule (
-  Person(..)
-) where
+module Extensions.TH.TemplateHaskellConsumerModule
+  ( Person (..),
+  )
+where
 
-import Language.Haskell.TH
-import Extensions.TH.TemplateHaskell
-import Extensions.TH.THLenses
 import Data.Functor.Identity
-
+import Extensions.TH.THLenses
+import Extensions.TH.TemplateHaskell
+import Language.Haskell.TH
 
 data Person = MkPerson {_name :: String, _age :: Int}
 
@@ -34,17 +34,20 @@ fstLensTH "puk"
 
 $(fstOfNLensTH "fstOf3" 3)
 
+tst1 = kek (\x -> Identity $ x + 55) (1, 2)
 
-tst1 = kek (\x -> Identity $ x + 55) (1,2)
-tst2 = puk (\x -> Identity $ x + 55) (1,2)
+tst2 = puk (\x -> Identity $ x + 55) (1, 2)
+
 tst3 = fstOf3 (\x -> Identity $ x + 55) (1, 2, 3)
-tst4 = $(typeName ''Bool)
-tst5 = $(typeName ''Eq)
-tst6 = $(typeName 'True)
-tst7 = $(stringE . show =<< reify ''Bool)
 
+tst4 = $(typeName ''Bool)
+
+tst5 = $(typeName ''Eq)
+
+tst6 = $(typeName 'True)
+
+tst7 = $(stringE . show =<< reify ''Bool)
 
 tst8 = $(listFields' ''Person)
 
 tst9 = [showQQ|tst8|]
-

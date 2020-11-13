@@ -1,7 +1,7 @@
-module Books.HaskellInDepth.DocTests (
-  foo
-) where
-
+module Books.HaskellInDepth.DocTests
+  ( foo,
+  )
+where
 
 -- | Foo
 --

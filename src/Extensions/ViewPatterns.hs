@@ -1,10 +1,12 @@
 {-# LANGUAGE ViewPatterns #-}
+
 module Extensions.ViewPatterns () where
 
 type Typ = Int
 
-data TypView = Unit
-             | Arrow Typ Typ
+data TypView
+  = Unit
+  | Arrow Typ Typ
 
 view :: Typ -> TypView
 view = undefined

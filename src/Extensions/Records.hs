@@ -1,23 +1,24 @@
+{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE DerivingStrategies #-}
+{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TypeApplications #-}
-{-# LANGUAGE DataKinds #-}
-{-# LANGUAGE FlexibleContexts #-}
+
 module Extensions.Records where
 
-import GHC.Records (HasField(..))
+import GHC.Records (HasField (..))
 
-data MyRecord = MkMyRecord {
-  a :: Int,
-  s :: String
-} deriving stock (Show)
+data MyRecord = MkMyRecord
+  { a :: Int,
+    s :: String
+  }
+  deriving stock (Show)
 
 foo :: MyRecord -> Int
-foo MkMyRecord{..} = a
+foo MkMyRecord {..} = a
 
 bar :: MyRecord -> MyRecord
-bar r = r{a = 55}
-
+bar r = r {a = 55}
 
 baz :: HasField "s" r String => r -> String
 baz r = reverse $ getField @"s" r
