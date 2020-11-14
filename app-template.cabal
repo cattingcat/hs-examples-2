@@ -39,6 +39,7 @@ library
       Books.HaskellInDepth.TypeFamily
       Books.HaskellInDepth.WriterTst
       CodeWars.BefungeInterpreter
+      Cabal.GitLibTest
       Design.Arrows
       Design.ChurchFreeMonad
       Design.Cps
@@ -149,6 +150,7 @@ library
     , transformers
     , uniplate
     , unix-compat
+    , language-befunge
   default-language: Haskell2010
 
 executable app-template-exe

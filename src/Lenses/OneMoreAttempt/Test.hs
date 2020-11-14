@@ -16,7 +16,7 @@
 {-# LANGUAGE TypeOperators #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
 
-module Lenses.OneMoreAttempt.Test () where
+module Lenses.OneMoreAttempt.Test where
 
 import Data.Coerce (coerce)
 import Data.Function ((&))
