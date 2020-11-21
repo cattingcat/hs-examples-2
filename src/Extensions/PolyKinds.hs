@@ -9,3 +9,7 @@ module Extensions.PolyKinds () where
 newtype App f a = MkApp (f a)
 
 newtype T a (b :: k) c = MkT (a c)
+
+
+-- Valid syntax. {k2 ...} is unable to be used in type applications
+-- T :: forall {k2 :: Type} (k :: Type) . (k2 -> Type) -> k -> k2 -> Type

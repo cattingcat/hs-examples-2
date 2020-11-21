@@ -4,7 +4,7 @@ module Cabal.GitLibTest (countStr) where
 
 import Language.Befunge.TH
 
--- | See cabal.project
+-- | Using lib from git. See cabal.project
 countStr :: String
 countStr =
   [befunge|
