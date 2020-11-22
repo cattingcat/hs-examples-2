@@ -96,6 +96,8 @@ library
       Extensions.Unboxed
       Extensions.UndecidableInstances
       Extensions.ViewPatterns
+      Extensions.BlockArguments
+      FixityTest
       HasCallStackTest
       HsSyntax.AssociatedData
       HsSyntax.AssociatedTypes
