@@ -53,6 +53,7 @@ library
       Design.Hkd
       Design.RecScheme
       Design.RecursionSchemes
+      Design.Encodings
       Design.TF.Extensibility
       Design.TF.FirstOrderLang
       Design.TF.HigherOrderLang
