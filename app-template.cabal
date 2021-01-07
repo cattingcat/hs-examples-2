@@ -98,6 +98,7 @@ library
       Extensions.UndecidableInstances
       Extensions.ViewPatterns
       Extensions.BlockArguments
+      Extensions.OverloadedStrings
       FixityTest
       HasCallStackTest
       HsSyntax.AssociatedData
