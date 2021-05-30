@@ -121,6 +121,8 @@ library
       SOP.TestSOP
       TypelevelMagic.Nats
       TypelevelMagic.Simgletons
+      TypelevelMagic.Typeclasses1
+      TypelevelMagic.Typeclasses2
       Uniplate.TestTypeable
       Uniplate.TestUniplate
   other-modules:
