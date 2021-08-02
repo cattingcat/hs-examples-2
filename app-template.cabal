@@ -51,6 +51,7 @@ library
       Design.Freer.RWer
       Design.GenericLens.Prism
       Design.Hkd
+      Design.Selective
       Design.RecScheme
       Design.RecursionSchemes
       Design.Encodings
@@ -151,6 +152,7 @@ library
     , relude
     , safe
     , safe-exceptions
+    , selective
     , tagged
     , template-haskell
     , transformers
