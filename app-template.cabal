@@ -133,7 +133,7 @@ library
   ghc-options: -Weverything -Wcompat -Wno-safe -Wno-unused-top-binds -Wno-missing-import-lists -Wno-missing-safe-haskell-mode -Wno-implicit-prelude -Wno-unsafe -Wno-unused-packages -funbox-strict-fields
   build-depends:
       algebraic-graphs
-    , base >=4.14
+    , base >=4.15
     , cond
     , containers
     , contravariant
@@ -170,7 +170,7 @@ executable app-template-exe
   build-depends:
       algebraic-graphs
     , app-template
-    , base >=4.14
+    , base >=4.15
     , cond
     , containers
     , contravariant
@@ -206,7 +206,7 @@ executable simulation
   build-depends:
       algebraic-graphs
     , app-template
-    , base >=4.14
+    , base >=4.15
     , cond
     , containers
     , contravariant
@@ -245,7 +245,7 @@ test-suite app-template-test
   build-depends:
       algebraic-graphs
     , app-template
-    , base >=4.14
+    , base >=4.15
     , cond
     , containers
     , contravariant
@@ -284,7 +284,7 @@ benchmark app-template-bench
   build-depends:
       algebraic-graphs
     , app-template
-    , base >=4.14
+    , base >=4.15
     , cond
     , containers
     , contravariant

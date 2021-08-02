@@ -15,7 +15,7 @@ add1 x = [|x + 1|]
 
 -- | Typed template haskell
 add2 :: Int -> Q (TExp Int)
-add2 x = [||x + 2||]
+add2 x = let Code c = [||x + 2||] in c
 
 -- pattern
 mkPat :: Q Pat

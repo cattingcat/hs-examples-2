@@ -54,7 +54,7 @@ _2 :: Lens (x, a) (x, b) a b
 _2 f (x, a) = f a <&> (x,)
 
 coerceLens :: Functor f => Lens s t a b -> LensLike f s t a b
-coerceLens = id
+coerceLens a = id a
 
 -- coerceLens' :: Functor f => LensLike f s t a b -> Lens s t a b
 -- coerceLens' = id
@@ -377,10 +377,10 @@ type Iso_ s t a b = forall p f. (Profunctor p, Functor f) => L p f s t a b
 type Prism_ s t a b = forall p f. (Choice p, Functor f) => L p f s t a b
 
 lens2traversal :: Lens_ s t a b -> Traversal_ s t a b
-lens2traversal = id
+lens2traversal a = id a
 
 iso2prism :: Iso_ s t a b -> Prism_ s t a b
-iso2prism = id
+iso2prism a = id a
 
 prism2Lens :: Prism_ s t a b -> Lens_ s t a b
-prism2Lens = id
+prism2Lens a = id (a @(->))

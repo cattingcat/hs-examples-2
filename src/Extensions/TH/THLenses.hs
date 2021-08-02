@@ -45,7 +45,7 @@ map2TH =
     -- type decl
     aName = VarT $ mkName "a"
     bName = VarT $ mkName "b"
-    forallAB = ForallT [PlainTV (mkName "a"), PlainTV (mkName "b")]
+    forallAB = ForallT [PlainTV (mkName "a") SpecifiedSpec, PlainTV (mkName "b") SpecifiedSpec]
     mkArr name = AppT ListT name
     farrow = aName `arrow` bName
     arrayArrow = mkArr aName `arrow` mkArr bName
@@ -102,7 +102,7 @@ patternBrackets :: Q Pat -- PAttern matching
 patternBrackets = [p|(a, x : xs, _)|]
 
 typedBracket :: Q (TExp String)
-typedBracket = [||"qwe"||]
+typedBracket = let Code c = [||"qwe"||] in c
 
 -- | Custom parser-function
 --    Specific method depends on syntactic ctx

@@ -71,5 +71,5 @@ f = undefined
 g :: ((forall a. a -> a) -> Char) -> Int
 g ff = undefined (ff id)
 
-h :: Int
-h = g f
+-- h :: Int
+-- h = g f
